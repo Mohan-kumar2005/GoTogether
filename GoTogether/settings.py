@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-jmupfbv3ma03n0fn2^4udj3y441g##i+#7&)o-tp0jue031(ar'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-local-development-only"
+)
 
-ALLOWED_HOSTS = ['*']
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS", "localhost,127.0.0.1"
+).split(",")
 
 # Application definition
 
@@ -134,25 +139,19 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # Real-time Email Configuration (Gmail SMTP)
 # Supports environment variables or GoTogether/email_config.py
-import os
+# Email Configuration (Gmail SMTP using environment variables)
 
-try:
-    from .email_config import GMAIL_USER, GMAIL_APP_PASSWORD
-except ImportError:
-    GMAIL_USER = os.environ.get('GMAIL_USER', '')
-    GMAIL_APP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD', '')
+GMAIL_USER = os.environ.get("GMAIL_USER", "")
+GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
-if GMAIL_USER and GMAIL_APP_PASSWORD and GMAIL_APP_PASSWORD != 'your_16_character_app_password':
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'
+if GMAIL_USER and GMAIL_APP_PASSWORD:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "smtp.gmail.com"
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
     EMAIL_HOST_USER = GMAIL_USER
-    EMAIL_HOST_PASSWORD = GMAIL_APP_PASSWORD.replace(' ', '')
+    EMAIL_HOST_PASSWORD = GMAIL_APP_PASSWORD.replace(" ", "")
     DEFAULT_FROM_EMAIL = f"GoTogether <{GMAIL_USER}>"
 else:
-    # Development fallback to console backend if Gmail credentials are not yet entered
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = 'GoTogether <noreply@gotogether.com>'
-
-
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = "GoTogether <noreply@gotogether.com>"
