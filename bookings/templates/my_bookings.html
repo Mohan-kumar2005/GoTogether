@@ -1,0 +1,257 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bookings - GoTogether{% endblock %}
+
+{% block content %}
+<div class="mb-page">
+    <div class="mb-container">
+
+        <!-- Page Header -->
+        <header class="mb-header">
+            <div class="mb-heading">
+                <span class="mb-eyebrow">
+                    <i class="bi bi-ticket-perforated-fill"></i>
+                    YOUR JOURNEYS
+                </span>
+                <h1>My <span>Bookings</span></h1>
+                <p>Manage your ride requests, track confirmations, and view your travel passes.</p>
+            </div>
+
+            <div class="mb-header-actions">
+                <img
+                    src="{% static 'images/gotogetherlogo.png' %}"
+                    alt="GoTogether logo"
+                    class="mb-logo"
+                >
+                <a href="{% url 'find_ride' %}" class="mb-btn mb-btn-primary">
+                    <i class="bi bi-search"></i>
+                    Find a Ride
+                </a>
+            </div>
+        </header>
+
+        <!-- Booking List -->
+        {% if bookings %}
+            <div class="mb-section-heading">
+                <div>
+                    <h2>Your Ride Requests</h2>
+                    <p>Review the details of each booking below.</p>
+                </div>
+                <span class="mb-count">
+                    <i class="bi bi-collection"></i>
+                    {{ bookings|length }} booking{{ bookings|length|pluralize }}
+                </span>
+            </div>
+
+            <div class="mb-booking-list">
+                {% for booking in bookings %}
+                    <article class="mb-card">
+
+                        <!-- Card Accent -->
+                        <div class="mb-card-accent"></div>
+
+                        <div class="mb-card-content">
+
+                            <!-- Route and Status -->
+                            <div class="mb-route-section">
+                                <div class="mb-card-labels">
+                                    {% if booking.ride.vehicle_type == '2_WHEELER' %}
+                                        <span class="mb-vehicle mb-bike">
+                                            <i class="bi bi-bicycle"></i>
+                                            2-Wheeler
+                                        </span>
+                                    {% else %}
+                                        <span class="mb-vehicle mb-car">
+                                            <i class="bi bi-car-front-fill"></i>
+                                            4-Wheeler
+                                        </span>
+                                    {% endif %}
+
+                                    {% if booking.status == 'PENDING' %}
+                                        <span class="mb-status mb-pending">
+                                            <i class="bi bi-hourglass-split"></i>
+                                            Pending Approval
+                                        </span>
+                                    {% elif booking.status == 'ACCEPTED' %}
+                                        <span class="mb-status mb-accepted">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            Confirmed
+                                        </span>
+                                    {% elif booking.status == 'CANCELLED' %}
+                                        <span class="mb-status mb-cancelled">
+                                            <i class="bi bi-x-circle-fill"></i>
+                                            Cancelled
+                                        </span>
+                                    {% else %}
+                                        <span class="mb-status mb-other">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <h3 class="mb-route-title">
+                                    {{ booking.ride.source_city }}
+                                    <span class="mb-route-arrow">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </span>
+                                    {{ booking.ride.destination_city }}
+                                </h3>
+
+                                <div class="mb-location">
+                                    <span class="mb-location-icon mb-pickup-icon">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                    </span>
+                                    <div>
+                                        <small>Pickup point</small>
+                                        <p>{{ booking.ride.pickup_point|default:"Not specified" }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="mb-location">
+                                    <span class="mb-location-icon mb-drop-icon">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                    </span>
+                                    <div>
+                                        <small>Drop point</small>
+                                        <p>{{ booking.ride.drop_point|default:"Not specified" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Travel Details -->
+                            <div class="mb-travel-section">
+                                <div class="mb-info-item">
+                                    <span class="mb-info-icon">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </span>
+                                    <div>
+                                        <small>Departure date</small>
+                                        <strong>
+                                            {{ booking.ride.departure_date|date:"d M Y" }}
+                                        </strong>
+                                        <span>
+                                            {{ booking.ride.departure_date|date:"l" }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-info-item">
+                                    <span class="mb-info-icon">
+                                        <i class="bi bi-clock"></i>
+                                    </span>
+                                    <div>
+                                        <small>Departure time</small>
+                                        <strong>
+                                            {{ booking.ride.departure_time|time:"H:i" }}
+                                        </strong>
+                                        <span>24-hour format</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-info-item">
+                                    <span class="mb-info-icon">
+                                        <i class="bi bi-person-badge"></i>
+                                    </span>
+                                    <div>
+                                        <small>Your driver</small>
+                                        <strong>
+                                            {{ booking.ride.driver.first_name|default:booking.ride.driver.username }}
+                                        </strong>
+                                        <span>Ride organizer</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fare -->
+                            <div class="mb-fare-section">
+                                <span class="mb-fare-label">
+                                    <i class="bi bi-people-fill"></i>
+                                    Seats booked
+                                </span>
+                                <strong class="mb-seat-count">
+                                    {{ booking.seats_booked }}
+                                    <span>seat{{ booking.seats_booked|pluralize }}</span>
+                                </strong>
+
+                                <div class="mb-fare-divider"></div>
+
+                                <span class="mb-fare-label">
+                                    <i class="bi bi-fuel-pump-fill"></i>
+                                    Your petrol share
+                                </span>
+                                <div class="mb-fare-amount">
+                                    <span>₹</span>{{ booking.total_fare|floatformat:2 }}
+                                </div>
+                                <small class="mb-fare-note">Total booking fare</small>
+                            </div>
+
+                        </div>
+
+                        <!-- Card Actions -->
+                        <footer class="mb-card-footer">
+                            <div class="mb-booking-reference">
+                                <i class="bi bi-shield-check"></i>
+                                Booking #{{ booking.id }}
+                            </div>
+
+                            <div class="mb-actions">
+                                <a
+                                    href="{% url 'booking_detail' booking.id %}"
+                                    class="mb-btn mb-btn-outline"
+                                >
+                                    <i class="bi bi-ticket-perforated"></i>
+                                    View Travel Pass
+                                </a>
+
+                                {% if booking.status == 'PENDING' or booking.status == 'ACCEPTED' %}
+                                    <a
+                                        href="{% url 'cancel_booking' booking.id %}"
+                                        class="mb-btn mb-btn-cancel"
+                                        onclick="return confirm('Are you sure you want to cancel this booking?');"
+                                    >
+                                        <i class="bi bi-x-circle"></i>
+                                        Cancel Booking
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </footer>
+
+                    </article>
+                {% endfor %}
+            </div>
+
+        {% else %}
+
+            <!-- Empty State -->
+            <section class="mb-empty">
+                <div class="mb-empty-icon">
+                    <i class="bi bi-ticket-perforated"></i>
+                </div>
+                <span class="mb-eyebrow">YOUR NEXT JOURNEY STARTS HERE</span>
+                <h2>No bookings <span>yet</span></h2>
+                <p>
+                    You haven't booked a ride yet. Find fellow travellers,
+                    share fuel costs, and make your next hometown journey affordable.
+                </p>
+                <a href="{% url 'find_ride' %}" class="mb-btn mb-btn-primary">
+                    <i class="bi bi-search"></i>
+                    Explore Available Rides
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </section>
+
+        {% endif %}
+
+        <!-- Footer Note -->
+        <div class="mb-footer-note">
+            <i class="bi bi-info-circle"></i>
+            <span>
+                Please confirm your departure details with the driver before travelling.
+            </span>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

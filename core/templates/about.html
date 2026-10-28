@@ -1,0 +1,359 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us | The GoTogether Story{% endblock %}
+
+{% block content %}
+
+<!-- ABOUT HERO -->
+<section class="about-hero">
+    <div class="about-hero-glow"></div>
+
+    
+        <span class="about-eyebrow">
+            <i class="bi bi-heart-fill"></i> OUR MISSION
+        </span>
+
+        <h1>Every Journey Has a Story.<br>
+            <span>Let's Travel Together.</span>
+        </h1>
+
+        <p class="about-hero-description">
+            We believe reaching home for festivals, family occasions,
+            and weekends should be easier and more affordable.
+            GoTogether connects travellers heading in the same direction.
+        </p>
+
+        <a href="{% url 'find_ride' %}" class="btn btn-primary-gt btn-lg">
+            <i class="bi bi-search"></i> Find Your Ride
+        </a>
+    </div>
+</section>
+
+
+<!-- OUR STORY -->
+<section class="container about-section">
+    <div class="about-story-grid">
+
+        <div class="about-story-content">
+            <span class="about-eyebrow">HOW IT STARTED</span>
+
+            <h2>Why We Created <span>GoTogether</span></h2>
+
+            <p>
+                During Pongal, Diwali, Eid, and long weekends, many
+                students and professionals travel from cities like
+                Chennai, Bengaluru, and Coimbatore to their hometowns.
+            </p>
+
+            <p>
+                At the same time, bus fares can become expensive and
+                people travelling alone often bear the full cost of fuel.
+                Meanwhile, cars and bikes travel along the same routes
+                with available passenger space.
+            </p>
+
+            <p>
+                We imagined a simpler solution: help people discover
+                suitable travel companions, coordinate their journeys,
+                and share agreed travel expenses.
+            </p>
+
+            <div class="about-quote">
+                <i class="bi bi-quote"></i>
+                <p>
+                    Share the Ride, Share the Journey.
+                    Make every trip count.
+                </p>
+            </div>
+        </div>
+
+        <div class="about-story-image">
+            <img src="{% static 'images/samp4.jpeg' %}"
+                 alt="GoTogether journey and travel community"
+                 loading="lazy">
+
+            <div class="image-caption">
+                <i class="bi bi-geo-alt-fill"></i>
+                One route. More connections.
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- IMAGE GALLERY -->
+<section class="about-gallery-section">
+    <div class="container">
+
+        <div class="about-section-heading">
+            <span class="about-eyebrow">THE JOURNEY MATTERS</span>
+            <h2>More Than Just <span>a Ride</span></h2>
+            <p>
+                Bringing people, places, and journeys together.
+            </p>
+        </div>
+
+        <div class="about-gallery-grid">
+
+            <article class="about-gallery-card gallery-card-large">
+                <img src="{% static 'images/samp1.jpeg' %}"
+                     alt="The GoTogether journey"
+                     loading="lazy">
+                <div class="gallery-overlay">
+                    <span>01 / OUR JOURNEY</span>
+                    <h3>Every Journey Begins Somewhere</h3>
+                    <p>Connect your plans with people going your way.</p>
+                </div>
+            </article>
+
+            <article class="about-gallery-card">
+                <img src="{% static 'images/samp2.jpeg' %}"
+                     alt="Travelling together"
+                     loading="lazy">
+                <div class="gallery-overlay">
+                    <span>02 / CONNECTION</span>
+                    <h3>Travel Together</h3>
+                    <p>Discover fellow travellers on your route.</p>
+                </div>
+            </article>
+
+            <article class="about-gallery-card">
+                <img src="{% static 'images/samp3.jpeg' %}"
+                     alt="Road trip and shared travel"
+                     loading="lazy">
+                <div class="gallery-overlay">
+                    <span>03 / SHARED JOURNEYS</span>
+                    <h3>Make Every Trip Count</h3>
+                    <p>Share available seats and agreed travel costs.</p>
+                </div>
+            </article>
+
+            <article class="about-gallery-card gallery-card-wide">
+                <img src="{% static 'images/samp4.jpeg' %}"
+                     alt="The destination and community behind GoTogether"
+                     loading="lazy">
+                <div class="gallery-overlay">
+                    <span>04 / REACH HOME</span>
+                    <h3>Closer to Home, Together</h3>
+                    <p>Make room for meaningful journeys and connections.</p>
+                </div>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- THE PROBLEM -->
+<section class="container about-section">
+    <div class="about-section-heading">
+        <span class="about-eyebrow">WHY IT MATTERS</span>
+        <h2>A Better Way to <span>Travel Home</span></h2>
+        <p>
+            We want to make everyday and festival travel more convenient.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <article class="about-info-card">
+                <div class="about-info-icon problem-icon">
+                    <i class="bi bi-ticket-perforated-fill"></i>
+                </div>
+                <h3>Expensive Bus Tickets</h3>
+                <p>
+                    Peak-season fares can put pressure on travel budgets.
+                    Shared journeys provide another option to explore.
+                </p>
+            </article>
+        </div>
+
+        <div class="col-md-4">
+            <article class="about-info-card">
+                <div class="about-info-icon">
+                    <i class="bi bi-fuel-pump-fill"></i>
+                </div>
+                <h3>Solo Travel Costs</h3>
+                <p>
+                    Travelling alone can mean paying all the fuel expenses
+                    yourself. Agreeing to share costs may make a trip
+                    more affordable.
+                </p>
+            </article>
+        </div>
+
+        <div class="col-md-4">
+            <article class="about-info-card">
+                <div class="about-info-icon">
+                    <i class="bi bi-signpost-split-fill"></i>
+                </div>
+                <h3>Similar Routes</h3>
+                <p>
+                    Travellers heading in the same direction can discover
+                    one another and coordinate suitable pickup and
+                    drop-off arrangements.
+                </p>
+            </article>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- VEHICLE OPTIONS -->
+<section class="about-vehicle-section">
+    <div class="container">
+
+        <div class="about-section-heading">
+            <span class="about-eyebrow">FIND YOUR WAY</span>
+            <h2>Two Ways to <span>Go Together</span></h2>
+            <p>Choose the vehicle type that matches your journey.</p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <article class="about-vehicle-card bike-vehicle">
+                    <div class="about-vehicle-icon">
+                        <i class="bi bi-bicycle"></i>
+                    </div>
+
+                    <span class="about-vehicle-tag">2-WHEELER</span>
+
+                    <h3>Bike </h3>
+
+                    <p>
+                        Discover suitable bike rides for shorter journeys.
+                        Rider and passenger safety comes first: follow
+                        applicable passenger limits and helmet requirements.
+                    </p>
+
+                    <a href="{% url 'find_ride' %}?vehicle_type=2_WHEELER"
+                       class="btn btn-outline-gt">
+                        Explore Bike Rides
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-md-6">
+                <article class="about-vehicle-card car-vehicle">
+                    <div class="about-vehicle-icon">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+
+                    <span class="about-vehicle-tag">4-WHEELER</span>
+
+                    <h3>Car</h3>
+
+                    <p>
+                        Discover car rides for hometown trips and longer
+                        journeys. Confirm seats, route, expenses, and
+                        driver arrangements before travelling.
+                    </p>
+
+                    <a href="{% url 'find_ride' %}?vehicle_type=4_WHEELER"
+                       class="btn btn-outline-gt">
+                        Explore Car Rides
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </article>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- OUR CORE VALUES -->
+<section class="container about-section">
+    <div class="about-section-heading text-center">
+        <span class="about-eyebrow">WHAT WE BELIEVE</span>
+        <h2>Our Core <span>Principles</span></h2>
+        <p>The values that guide the GoTogether experience.</p>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <article class="about-value-card">
+                <div class="about-value-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3>Safety First</h3>
+                <p>
+                    Encourage responsible travel, appropriate
+                    verification, valid driving licences, and
+                    compliance with road safety requirements.
+                </p>
+            </article>
+        </div>
+
+        <div class="col-md-4">
+            <article class="about-value-card">
+                <div class="about-value-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+                <h3>Fair Cost Sharing</h3>
+                <p>
+                    Make agreed travel expenses clear to everyone
+                    before a journey begins.
+                </p>
+            </article>
+        </div>
+
+        <div class="col-md-4">
+            <article class="about-value-card">
+                <div class="about-value-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <h3>Community Respect</h3>
+                <p>
+                    Encourage clear communication, punctual pickups,
+                    courtesy, and respect between travel companions.
+                </p>
+            </article>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- CTA -->
+<section class="container about-section">
+    <div class="about-cta">
+
+        <img src="{% static 'images/gotogetherlogo.png' %}"
+             alt="GoTogether"
+             class="about-cta-logo"
+             loading="lazy">
+
+        <span class="about-eyebrow">YOUR JOURNEY STARTS HERE</span>
+
+        <h2>Let's Reach Home <span>Together.</span></h2>
+
+        <p>
+            Join the community, find a suitable ride, or share your
+            own journey with fellow travellers.
+        </p>
+
+        <div class="about-cta-actions">
+            <a href="{% url 'signup' %}" class="btn btn-primary-gt btn-lg">
+                <i class="bi bi-person-plus-fill"></i>
+                Create Free Account
+            </a>
+
+            <a href="{% url 'find_ride' %}" class="btn btn-outline-gt btn-lg">
+                <i class="bi bi-search"></i>
+                Search Rides
+            </a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

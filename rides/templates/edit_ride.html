@@ -1,0 +1,229 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Ride - {{ ride.source_city }} to {{ ride.destination_city }} - GoTogether{% endblock %}
+
+{% block content %}
+<section class="edit-ride-page">
+    <div class="edit-ride-container">
+
+        <div class="edit-ride-heading">
+            <a href="{% url 'my_rides' %}" class="edit-ride-back">
+                <i class="bi bi-arrow-left"></i> Back to My Rides
+            </a>
+
+            <div class="edit-ride-title-wrap">
+                <span class="edit-ride-eyebrow">
+                    <i class="bi bi-car-front-fill"></i> RIDE MANAGEMENT
+                </span>
+                <h1>Edit <span>Ride Details</span></h1>
+                <p>Update your journey information and travel cost.</p>
+            </div>
+        </div>
+
+        <div class="edit-ride-card">
+            <div class="edit-ride-route">
+                <div class="edit-ride-route-icon">
+                    <i class="bi bi-signpost-split-fill"></i>
+                </div>
+                <div class="edit-ride-route-info">
+                    <span class="edit-ride-label">YOUR JOURNEY</span>
+                    <h2>{{ ride.source_city }} <span>→</span> {{ ride.destination_city }}</h2>
+                    <p>
+                        <i class="bi bi-calendar-event"></i>
+                        {{ ride.departure_date }}
+                    </p>
+                </div>
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="edit-ride-alert edit-ride-alert-error">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form
+                action="{% url 'edit_ride' ride.id %}"
+                method="POST"
+                id="editRideForm"
+            >
+                {% csrf_token %}
+
+                <div class="edit-ride-section-heading">
+                    <span class="edit-ride-section-number">01</span>
+                    <div>
+                        <h3>Journey Details</h3>
+                        <p>Update your pickup, drop-off and departure time.</p>
+                    </div>
+                </div>
+
+                <div class="edit-ride-grid">
+                    <div class="edit-ride-field">
+                        <label for="{{ form.pickup_point.id_for_label }}">
+                            <i class="bi bi-geo-alt"></i> Pickup Landmark
+                        </label>
+                        {{ form.pickup_point }}
+                        {% for error in form.pickup_point.errors %}
+                            <small class="edit-ride-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="edit-ride-field">
+                        <label for="{{ form.drop_point.id_for_label }}">
+                            <i class="bi bi-geo-alt-fill"></i> Drop Landmark
+                        </label>
+                        {{ form.drop_point }}
+                        {% for error in form.drop_point.errors %}
+                            <small class="edit-ride-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="edit-ride-field">
+                        <label for="{{ form.departure_date.id_for_label }}">
+                            <i class="bi bi-calendar3"></i> Departure Date
+                        </label>
+                        {{ form.departure_date }}
+                        {% for error in form.departure_date.errors %}
+                            <small class="edit-ride-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="edit-ride-field">
+                        <label for="{{ form.departure_time.id_for_label }}">
+                            <i class="bi bi-clock"></i> Departure Time
+                        </label>
+                        {{ form.departure_time }}
+                        {% for error in form.departure_time.errors %}
+                            <small class="edit-ride-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="edit-ride-section-heading">
+                    <span class="edit-ride-section-number">02</span>
+                    <div>
+                        <h3>Vehicle Information</h3>
+                        <p>Keep your vehicle and seat details accurate.</p>
+                    </div>
+                </div>
+
+                <div class="edit-ride-grid edit-ride-grid-three">
+                    <div class="edit-ride-field">
+                        <label for="{{ form.vehicle_type.id_for_label }}">
+                            <i class="bi bi-car-front"></i> Vehicle Type
+                        </label>
+                        {{ form.vehicle_type }}
+                        {% for error in form.vehicle_type.errors %}
+                            <small class="edit-ride-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="edit-ride-field">
+                        <label for="{{ form.vehicle_model.id_for_label }}">
+                            <i class="bi bi-car-front-fill"></i> Vehicle Model
+                        </label>
+                        {{ form.vehicle_model }}
+                        {% for error in form.vehicle_model.errors %}
+                            <small class="edit-ride-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="edit-ride-field">
+                        <label for="{{ form.total_seats.id_for_label }}">
+                            <i class="bi bi-people"></i> Available Seats
+                        </label>
+                        {{ form.total_seats }}
+                        {% for error in form.total_seats.errors %}
+                            <small class="edit-ride-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="edit-ride-section-heading">
+                    <span class="edit-ride-section-number">03</span>
+                    <div>
+                        <h3>Travel Cost</h3>
+                        <p>Review the estimated fuel expense and cost per seat.</p>
+                    </div>
+                </div>
+
+                <div class="edit-ride-grid">
+                    <div class="edit-ride-field">
+                        <label for="{{ form.total_estimated_fuel_cost.id_for_label }}">
+                            <i class="bi bi-fuel-pump"></i> Total Estimated Fuel Cost (₹)
+                        </label>
+                        {{ form.total_estimated_fuel_cost }}
+                        {% for error in form.total_estimated_fuel_cost.errors %}
+                            <small class="edit-ride-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="edit-ride-field">
+                        <label for="{{ form.cost_per_seat.id_for_label }}">
+                            <i class="bi bi-currency-rupee"></i> Cost Per Seat (₹)
+                        </label>
+                        {{ form.cost_per_seat }}
+                        {% for error in form.cost_per_seat.errors %}
+                            <small class="edit-ride-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="edit-ride-cost-note">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>Check the cost per seat before saving. Make sure it reflects your intended cost-sharing arrangement.</span>
+                </div>
+
+                <div class="edit-ride-section-heading">
+                    <span class="edit-ride-section-number">04</span>
+                    <div>
+                        <h3>Additional Information</h3>
+                        <p>Add any useful instructions for your co-passengers.</p>
+                    </div>
+                </div>
+
+                <div class="edit-ride-field edit-ride-notes">
+                    <label for="{{ form.additional_notes.id_for_label }}">
+                        <i class="bi bi-chat-left-text"></i> Additional Notes
+                    </label>
+                    {{ form.additional_notes }}
+                    {% for error in form.additional_notes.errors %}
+                        <small class="edit-ride-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="edit-ride-actions">
+                    <button type="submit" class="edit-ride-save-btn">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Save Changes
+                    </button>
+
+                    <button
+                        type="submit"
+                        name="cancel_ride"
+                        value="1"
+                        class="edit-ride-cancel-btn"
+                        id="cancelRideButton"
+                        data-confirm="Are you sure you want to cancel this ride? Co-passengers will be notified."
+                    >
+                        <i class="bi bi-x-circle-fill"></i>
+                        Cancel Ride
+                    </button>
+                </div>
+
+                <p class="edit-ride-footer-note">
+                    <i class="bi bi-shield-check"></i>
+                    Review your changes before submitting.
+                </p>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/script.js' %}" defer></script>
+{% endblock %}

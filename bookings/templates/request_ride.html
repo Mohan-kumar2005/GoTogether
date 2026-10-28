@@ -1,0 +1,434 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Request Ride - {{ ride.source_city }} to {{ ride.destination_city }} - GoTogether{% endblock %}
+
+{% block content %}
+<div class="rr-page">
+    <div class="rr-container">
+
+        <!-- Header -->
+        <header class="rr-header">
+            <div class="rr-header-copy">
+                <span class="rr-eyebrow">
+                    <i class="bi bi-signpost-split-fill"></i>
+                    JOIN A JOURNEY
+                </span>
+                <h1>Request to <span>Join Ride</span></h1>
+                <p>Share the journey, split the petrol cost, and travel together.</p>
+            </div>
+
+            <img
+                src="{% static 'images/gotogetherlogo.png' %}"
+                alt="GoTogether logo"
+                class="rr-logo"
+            >
+        </header>
+
+        <!-- Route Banner -->
+        <section class="rr-route-banner">
+            <div class="rr-route-top">
+                <span class="rr-route-label">
+                    <i class="bi bi-map-fill"></i>
+                    YOUR SELECTED JOURNEY
+                </span>
+
+                {% if ride.vehicle_type == '2_WHEELER' %}
+                    <span class="rr-vehicle rr-bike">
+                        <i class="bi bi-bicycle"></i> 2-Wheeler
+                    </span>
+                {% else %}
+                    <span class="rr-vehicle rr-car">
+                        <i class="bi bi-car-front-fill"></i> 4-Wheeler
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="rr-route-cities">
+                <div class="rr-city">
+                    <span class="rr-city-dot"></span>
+                    <div>
+                        <small>FROM</small>
+                        <h2>{{ ride.source_city }}</h2>
+                        <p>{{ ride.pickup_point|default:"Pickup point to be confirmed" }}</p>
+                    </div>
+                </div>
+
+                <div class="rr-route-connector">
+                    <span></span>
+                    <i class="bi bi-arrow-right"></i>
+                    <span></span>
+                </div>
+
+                <div class="rr-city rr-destination">
+                    <span class="rr-city-dot"></span>
+                    <div>
+                        <small>TO</small>
+                        <h2>{{ ride.destination_city }}</h2>
+                        <p>{{ ride.drop_point|default:"Drop point to be confirmed" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rr-route-meta">
+                <div>
+                    <i class="bi bi-calendar-event"></i>
+                    {{ ride.departure_date|date:"D, d M Y" }}
+                </div>
+                <div>
+                    <i class="bi bi-clock"></i>
+                    {{ ride.departure_time|time:"H:i" }} hrs
+                </div>
+                <div>
+                    <i class="bi bi-person-fill"></i>
+                    Driver:
+                    <strong>{{ ride.driver.first_name|default:ride.driver.username }}</strong>
+                </div>
+            </div>
+        </section>
+
+        <div class="rr-layout">
+
+            <!-- Main Form -->
+            <main class="rr-form-card">
+                <div class="rr-card-heading">
+                    <div class="rr-heading-icon">
+                        <i class="bi bi-clipboard2-check"></i>
+                    </div>
+                    <div>
+                        <h2>Ride Request Details</h2>
+                        <p>Complete the details below to send your request.</p>
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="rr-error-summary" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div>{{ form.non_field_errors }}</div>
+                    </div>
+                {% endif %}
+
+                <form
+                    id="requestRideForm"
+                    action="{% url 'request_ride' ride.id %}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+                    {% csrf_token %}
+
+                    <!-- Seats and Fare -->
+                    <section class="rr-form-section">
+                        <div class="rr-section-heading">
+                            <span class="rr-section-number">01</span>
+                            <div>
+                                <h3>Seats & Contribution</h3>
+                                <p>Choose how many seats you need.</p>
+                            </div>
+                        </div>
+
+                        <div class="rr-seat-grid">
+                            <div class="rr-field">
+                                <label for="{{ form.seats_booked.id_for_label }}">
+                                    Number of Seats <span>*</span>
+                                </label>
+                                {{ form.seats_booked }}
+                                {% if form.seats_booked.errors %}
+                                    <div class="rr-field-error">{{ form.seats_booked.errors }}</div>
+                                {% endif %}
+
+                                {% if ride.is_two_wheeler %}
+                                    <small class="rr-help">
+                                        <i class="bi bi-info-circle"></i>
+                                        A two-wheeler can carry only one pillion passenger.
+                                    </small>
+                                {% else %}
+                                    <small class="rr-help">
+                                        Select the number of seats you need for this journey.
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            <div
+                                class="rr-fare-box"
+                                id="rrFareBox"
+                                data-price="{{ ride.cost_per_seat|default_if_none:0 }}"
+                            >
+                                <span class="rr-fare-label">
+                                    <i class="bi bi-fuel-pump-fill"></i>
+                                    YOUR ESTIMATED CONTRIBUTION
+                                </span>
+                                <div class="rr-fare-total" id="totalFareDisplay">
+                                    ₹{{ ride.cost_per_seat|default_if_none:0|floatformat:2 }}
+                                </div>
+                                <p>
+                                    <span id="rrFareSeats">1 seat</span>
+                                    <span class="rr-fare-dot">•</span>
+                                    Petrol cost share
+                                </p>
+                                <small>Final amount depends on the selected seats and booking rules.</small>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Helmet Safety -->
+                    {% if ride.is_two_wheeler %}
+                        <section class="rr-safety-panel rr-helmet-panel">
+                            <div class="rr-panel-heading">
+                                <div class="rr-panel-icon">
+                                    <i class="bi bi-shield-fill-check"></i>
+                                </div>
+                                <div>
+                                    <span class="rr-panel-kicker">PASSENGER SAFETY</span>
+                                    <h3>Helmet Safety Acknowledgment</h3>
+                                </div>
+                            </div>
+
+                            <p class="rr-panel-description">
+                                Wearing a properly fitted, certified helmet is essential
+                                throughout the entire two-wheeler journey.
+                            </p>
+
+                            {% if ride.has_spare_helmet %}
+                                <div class="rr-notice rr-notice-success">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <span>The driver has indicated that a spare helmet is available. Confirm its fit and condition before travelling.</span>
+                                </div>
+                            {% else %}
+                                <div class="rr-notice rr-notice-warning">
+                                    <i class="bi bi-exclamation-circle-fill"></i>
+                                    <span>The driver has not indicated a spare helmet. Arrange your own properly fitted helmet before departure.</span>
+                                </div>
+                            {% endif %}
+
+                            <div class="rr-checkbox-row rr-helmet-check">
+                                {{ form.confirmed_helmet }}
+                                <label for="id_confirmed_helmet">
+                                    I confirm that I will wear a certified helmet for the entire two-wheeler ride.
+                                    <span>*</span>
+                                </label>
+                            </div>
+
+                            {% if form.confirmed_helmet.errors %}
+                                <div class="rr-field-error">{{ form.confirmed_helmet.errors }}</div>
+                            {% endif %}
+                        </section>
+                    {% endif %}
+
+                    <!-- Driving -->
+                    <section class="rr-safety-panel rr-driving-panel">
+                        <div class="rr-panel-heading">
+                            <div class="rr-panel-icon">
+                                <i class="bi bi-steering-wheel"></i>
+                            </div>
+                            <div>
+                                <span class="rr-panel-kicker">OPTIONAL DRIVER SUPPORT</span>
+                                <h3>Driving Knowledge & Shift Sharing</h3>
+                            </div>
+                        </div>
+
+                        <p class="rr-panel-description">
+                            Let the driver know whether you can legally drive and whether
+                            you are willing to share driving duties. This is optional and
+                            does not replace the driver's responsibility to drive safely.
+                        </p>
+
+                        <div class="rr-driving-options">
+                            <label class="rr-option-card" for="id_knows_driving">
+                                {{ form.knows_driving }}
+                                <span class="rr-option-content">
+                                    <span class="rr-option-title">
+                                        <i class="bi bi-card-checklist"></i>
+                                        I can drive
+                                    </span>
+                                    <span class="rr-option-description">
+                                        I hold a valid licence for the relevant vehicle.
+                                    </span>
+                                </span>
+                            </label>
+
+                            <label class="rr-option-card" for="id_willing_to_swap">
+                                {{ form.willing_to_swap_driving }}
+                                <span class="rr-option-content">
+                                    <span class="rr-option-title">
+                                        <i class="bi bi-arrow-left-right"></i>
+                                        Willing to share driving
+                                    </span>
+                                    <span class="rr-option-description">
+                                        I am willing to take turns driving if appropriate.
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
+
+                        {% if form.knows_driving.errors %}
+                            <div class="rr-field-error">{{ form.knows_driving.errors }}</div>
+                        {% endif %}
+                        {% if form.willing_to_swap_driving.errors %}
+                            <div class="rr-field-error">{{ form.willing_to_swap_driving.errors }}</div>
+                        {% endif %}
+
+                        <!-- Expandable Licence Fields -->
+                        <div id="swapDrivingDetails" class="rr-license-panel" hidden>
+                            <div class="rr-license-heading">
+                                <i class="bi bi-file-earmark-lock-fill"></i>
+                                <div>
+                                    <h4>Driving Licence Details</h4>
+                                    <p>Shown when you indicate that you can drive.</p>
+                                </div>
+                            </div>
+
+                            <div class="rr-field-grid">
+                                <div class="rr-field">
+                                    <label for="{{ form.license_number.id_for_label }}">
+                                        Driving Licence Number
+                                    </label>
+                                    {{ form.license_number }}
+                                    {% if form.license_number.errors %}
+                                        <div class="rr-field-error">{{ form.license_number.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="rr-field">
+                                    <label for="{{ form.license_document.id_for_label }}">
+                                        Licence Copy / Photo
+                                    </label>
+                                    {{ form.license_document }}
+                                    {% if form.license_document.errors %}
+                                        <div class="rr-field-error">{{ form.license_document.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <small class="rr-help">
+                                <i class="bi bi-shield-check"></i>
+                                Upload only a genuine, valid licence document. Your server should validate uploaded files securely.
+                            </small>
+                        </div>
+                    </section>
+
+                    <!-- Pickup and Message -->
+                    <section class="rr-form-section">
+                        <div class="rr-section-heading">
+                            <span class="rr-section-number">03</span>
+                            <div>
+                                <h3>Pickup & Message</h3>
+                                <p>Help the driver coordinate your trip.</p>
+                            </div>
+                        </div>
+
+                        <div class="rr-field rr-full-field">
+                            <label for="{{ form.pickup_note.id_for_label }}">
+                                Preferred Pickup Spot / Landmark
+                            </label>
+                            {{ form.pickup_note }}
+                            {% if form.pickup_note.errors %}
+                                <div class="rr-field-error">{{ form.pickup_note.errors }}</div>
+                            {% endif %}
+                            <small class="rr-help">
+                                Example: near Karur bypass circle or a nearby landmark.
+                            </small>
+                        </div>
+
+                        <div class="rr-field rr-full-field">
+                            <label for="{{ form.passenger_message.id_for_label }}">
+                                Message for Driver
+                            </label>
+                            {{ form.passenger_message }}
+                            {% if form.passenger_message.errors %}
+                                <div class="rr-field-error">{{ form.passenger_message.errors }}</div>
+                            {% endif %}
+                            <small class="rr-help">
+                                Mention luggage, reporting time, or any questions.
+                            </small>
+                        </div>
+                    </section>
+
+                    <!-- Submit -->
+                    <div class="rr-submit-area">
+                        <button type="submit" class="rr-submit-btn">
+                            <i class="bi bi-send-check-fill"></i>
+                            Send Ride Request
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                        <p>
+                            <i class="bi bi-info-circle"></i>
+                            Your request may need driver approval before your booking is confirmed.
+                        </p>
+                    </div>
+                </form>
+            </main>
+
+            <!-- Ride Summary Sidebar -->
+            <aside class="rr-sidebar">
+                <div class="rr-summary-card">
+                    <div class="rr-summary-heading">
+                        <i class="bi bi-receipt-cutoff"></i>
+                        <h3>Ride Summary</h3>
+                    </div>
+
+                    <div class="rr-summary-route">
+                        <div class="rr-summary-point">
+                            <span class="rr-summary-dot"></span>
+                            <div>
+                                <small>Departure</small>
+                                <strong>{{ ride.source_city }}</strong>
+                            </div>
+                        </div>
+                        <div class="rr-summary-line"></div>
+                        <div class="rr-summary-point">
+                            <span class="rr-summary-dot rr-summary-dot-end"></span>
+                            <div>
+                                <small>Destination</small>
+                                <strong>{{ ride.destination_city }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rr-summary-row">
+                        <span>Vehicle</span>
+                        <strong>{{ ride.vehicle_model|default:ride.get_vehicle_type_display }}</strong>
+                    </div>
+                    <div class="rr-summary-row">
+                        <span>Driver</span>
+                        <strong>{{ ride.driver.first_name|default:ride.driver.username }}</strong>
+                    </div>
+                    <div class="rr-summary-row">
+                        <span>Departure</span>
+                        <strong>{{ ride.departure_date|date:"d M Y" }}</strong>
+                    </div>
+                    <div class="rr-summary-row">
+                        <span>Time</span>
+                        <strong>{{ ride.departure_time|time:"H:i" }} hrs</strong>
+                    </div>
+                    <div class="rr-summary-row">
+                        <span>Available seats</span>
+                        <strong>{{ ride.available_seats }}</strong>
+                    </div>
+
+                    <div class="rr-summary-price">
+                        <small>Contribution per seat</small>
+                        <strong>₹{{ ride.cost_per_seat|default_if_none:0|floatformat:2 }}</strong>
+                    </div>
+
+                    <div class="rr-summary-note">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Confirm pickup details and safety arrangements with the driver before departure.</span>
+                    </div>
+                </div>
+
+                <div class="rr-help-card">
+                    <i class="bi bi-people-fill"></i>
+                    <h3>Travel Together</h3>
+                    <p>Share the journey, contribute fairly, and coordinate respectfully with your fellow travellers.</p>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/request_ride.js' %}"></script>
+{% endblock %}

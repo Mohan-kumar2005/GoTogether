@@ -1,0 +1,393 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ ride.source_city }} to {{ ride.destination_city }} - Ride Details - GoTogether{% endblock %}
+
+{% block content %}
+<div class="rd-page">
+    <div class="rd-container">
+
+        <!-- Page heading -->
+        <div class="rd-page-heading">
+            <a href="{% url 'find_ride' %}" class="rd-back-link">
+                <i class="bi bi-arrow-left"></i> Back to Find Rides
+            </a>
+            <span class="rd-eyebrow">GOTogether · RIDE DETAILS</span>
+            <h1>Your Journey, <span>Shared.</span></h1>
+            <p>Review the route, driver, safety details and estimated travel cost.</p>
+        </div>
+
+        <div class="rd-layout">
+
+            <!-- MAIN RIDE INFORMATION -->
+            <main class="rd-main">
+                <section class="rd-card rd-ride-overview">
+
+                    <div class="rd-overview-top">
+                        <div class="rd-badges">
+                            {% if ride.vehicle_type == '2_WHEELER' %}
+                                <span class="rd-badge rd-badge-bike">
+                                    <i class="bi bi-bicycle"></i> 2-Wheeler
+                                </span>
+                            {% else %}
+                                <span class="rd-badge rd-badge-car">
+                                    <i class="bi bi-car-front-fill"></i> 4-Wheeler
+                                </span>
+                            {% endif %}
+
+                            {% if ride.festival != 'NONE' %}
+                                <span class="rd-badge rd-badge-festival">
+                                    <i class="bi bi-stars"></i>
+                                    {{ ride.get_festival_display }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <span class="rd-seat-badge">
+                            <i class="bi bi-person-check-fill"></i>
+                            {{ ride.available_seats }} seat{{ ride.available_seats|pluralize }} available
+                        </span>
+                    </div>
+
+                    <div class="rd-route-heading">
+                        <div>
+                            <span class="rd-section-label">YOUR ROUTE</span>
+                            <h2>
+                                {{ ride.source_city }}
+                                <i class="bi bi-arrow-right"></i>
+                                {{ ride.destination_city }}
+                            </h2>
+                        </div>
+                    </div>
+
+                    <!-- Route timeline -->
+                    <div class="rd-route-card">
+                        <div class="rd-route-stop">
+                            <div class="rd-timeline">
+                                <span class="rd-timeline-dot rd-dot-start"></span>
+                                <span class="rd-timeline-line"></span>
+                            </div>
+
+                            <div class="rd-stop-content">
+                                <div class="rd-stop-info">
+                                    <span class="rd-field-label">
+                                        <i class="bi bi-geo-alt"></i> PICKUP LOCATION
+                                    </span>
+                                    <h3>{{ ride.pickup_point|default:"Not specified" }}</h3>
+                                    <span class="rd-city-name">{{ ride.source_city }}</span>
+                                </div>
+
+                                <div class="rd-stop-time">
+                                    <span class="rd-field-label">DEPARTURE DATE</span>
+                                    <strong>{{ ride.departure_date|date:"D, d M Y" }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rd-route-stop rd-route-stop-last">
+                            <div class="rd-timeline">
+                                <span class="rd-timeline-dot rd-dot-end"></span>
+                            </div>
+
+                            <div class="rd-stop-content">
+                                <div class="rd-stop-info">
+                                    <span class="rd-field-label">
+                                        <i class="bi bi-geo"></i> DROP LOCATION
+                                    </span>
+                                    <h3>{{ ride.drop_point|default:"Not specified" }}</h3>
+                                    <span class="rd-city-name">{{ ride.destination_city }}</span>
+                                </div>
+
+                                <div class="rd-stop-time">
+                                    <span class="rd-field-label">DEPARTURE TIME</span>
+                                    <strong class="rd-time-highlight">
+                                        {{ ride.departure_time|time:"H:i" }} hrs
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Two-wheeler helmet safety -->
+                    {% if ride.is_two_wheeler %}
+                        <div class="rd-notice rd-notice-safety">
+                            <div class="rd-notice-icon">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <div class="rd-notice-content">
+                                <h3>Helmet Safety Policy</h3>
+                                <p>
+                                    A certified safety helmet is compulsory for both the
+                                    driver and passenger. Please follow applicable road
+                                    safety rules throughout the journey.
+                                </p>
+
+                                {% if ride.has_spare_helmet %}
+                                    <div class="rd-notice-status rd-status-success">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Driver provides a spare helmet for the passenger.
+                                    </div>
+                                {% else %}
+                                    <div class="rd-notice-status rd-status-warning">
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                        Passenger must bring their own certified helmet.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Shared driving notice -->
+                    {% if ride.open_to_swap_driving %}
+                        <div class="rd-notice rd-notice-swap">
+                            <div class="rd-notice-icon">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </div>
+                            <div class="rd-notice-content">
+                                <h3>Open to Shared Driving</h3>
+                                <p>
+                                    The driver is open to sharing driving duties.
+                                    Only appropriately licensed and legally eligible
+                                    drivers should take the wheel, with the vehicle
+                                    owner's permission.
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Trip specifications -->
+                    <div class="rd-subheading">
+                        <h3>Trip Information</h3>
+                        <span>Vehicle &amp; travel details</span>
+                    </div>
+
+                    <div class="rd-spec-grid">
+                        <div class="rd-spec-item">
+                            <div class="rd-spec-icon">
+                                <i class="bi bi-car-front"></i>
+                            </div>
+                            <span class="rd-field-label">VEHICLE</span>
+                            <strong>{{ ride.vehicle_model|default:"Not specified" }}</strong>
+                            <small>{{ ride.vehicle_number|default:"Number not provided" }}</small>
+                        </div>
+
+                        <div class="rd-spec-item">
+                            <div class="rd-spec-icon">
+                                <i class="bi bi-signpost-2"></i>
+                            </div>
+                            <span class="rd-field-label">DISTANCE</span>
+                            <strong>{{ ride.estimated_distance_km|default:"—" }} km</strong>
+                            <small>Estimated trip distance</small>
+                        </div>
+
+                        <div class="rd-spec-item">
+                            <div class="rd-spec-icon">
+                                <i class="bi bi-luggage"></i>
+                            </div>
+                            <span class="rd-field-label">LUGGAGE</span>
+                            <strong>{{ ride.get_luggage_space_display|default:"Not specified" }}</strong>
+                            <small>Available luggage space</small>
+                        </div>
+                    </div>
+
+                    <!-- Driver notes -->
+                    {% if ride.additional_notes %}
+                        <div class="rd-driver-notes">
+                            <div class="rd-notes-heading">
+                                <i class="bi bi-chat-left-text"></i>
+                                <strong>Driver's Notes</strong>
+                            </div>
+                            <p>{{ ride.additional_notes|linebreaksbr }}</p>
+                        </div>
+                    {% endif %}
+
+                    <!-- Confirmed passengers -->
+                    {% if accepted_passengers %}
+                        <div class="rd-passengers-section">
+                            <div class="rd-subheading">
+                                <h3>
+                                    <i class="bi bi-people"></i>
+                                    Confirmed Co-Passengers
+                                </h3>
+                                <span>{{ accepted_passengers.count }} passenger{{ accepted_passengers.count|pluralize }}</span>
+                            </div>
+
+                            <div class="rd-passenger-list">
+                                {% for req in accepted_passengers %}
+                                    <div class="rd-passenger">
+                                        <div class="rd-passenger-avatar">
+                                            {{ req.passenger.username|make_list|first|upper }}
+                                        </div>
+                                        <div class="rd-passenger-info">
+                                            <strong>
+                                                {{ req.passenger.first_name|default:req.passenger.username }}
+                                            </strong>
+                                            <span>
+                                                {{ req.seats_booked }} seat{{ req.seats_booked|pluralize }}
+                                            </span>
+                                        </div>
+                                        {% if req.willing_to_swap_driving %}
+                                            <span class="rd-swap-tag">
+                                                <i class="bi bi-arrow-left-right"></i> Swap driver
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </section>
+            </main>
+
+            <!-- SIDEBAR -->
+            <aside class="rd-sidebar">
+
+                <!-- Fare and booking -->
+                <section class="rd-card rd-fare-card">
+                    <div class="rd-fare-heading">
+                        <span class="rd-section-label">YOUR SHARE OF THE TRIP</span>
+                        <span class="rd-fare-icon"><i class="bi bi-fuel-pump"></i></span>
+                    </div>
+
+                    <div class="rd-fare-amount">
+                        <span class="rd-currency">₹</span>{{ ride.cost_per_seat }}
+                    </div>
+                    <p class="rd-fare-caption">Estimated cost per person</p>
+
+                    <div class="rd-fare-divider"></div>
+
+                    <div class="rd-fare-comparison">
+                        <div class="rd-fare-row">
+                            <span>Private bus ticket</span>
+                            <strong class="rd-old-fare">₹{{ base_bus_fare }}</strong>
+                        </div>
+                        <div class="rd-fare-row rd-savings-row">
+                            <span><i class="bi bi-piggy-bank"></i> Estimated savings</span>
+                            <strong>₹{{ savings }}</strong>
+                        </div>
+                        <small class="rd-savings-caption">
+                            Savings estimate: {{ savings|default:"60" }}%
+                        </small>
+                    </div>
+
+                    <div class="rd-fuel-info">
+                        <i class="bi bi-fuel-pump-fill"></i>
+                        <div>
+                            <span>Estimated total fuel cost</span>
+                            <strong>₹{{ ride.total_estimated_fuel_cost }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="rd-booking-actions">
+
+                        {% if is_driver %}
+                            <a href="{% url 'ride_specific_requests' ride.id %}"
+                               class="rd-btn rd-btn-primary">
+                                <i class="bi bi-inbox-fill"></i>
+                                Review Requests ({{ ride.requests.count }})
+                            </a>
+
+                            <a href="{% url 'edit_ride' ride.id %}"
+                               class="rd-btn rd-btn-secondary">
+                                <i class="bi bi-pencil-square"></i>
+                                Edit / Cancel Ride
+                            </a>
+
+                        {% elif user_has_requested %}
+                            <div class="rd-request-status">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <div>
+                                    <strong>Request Submitted</strong>
+                                    <span>
+                                        Status:
+                                        {{ existing_request.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a href="{% url 'booking_detail' existing_request.id %}"
+                               class="rd-btn rd-btn-primary">
+                                View Boarding Details
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+
+                        {% elif ride.available_seats <= 0 %}
+                            <button class="rd-btn rd-btn-disabled" disabled>
+                                <i class="bi bi-x-circle"></i>
+                                Ride Fully Booked
+                            </button>
+
+                        {% else %}
+                            <a href="{% url 'request_ride' ride.id %}"
+                               class="rd-btn rd-btn-primary">
+                                <i class="bi bi-ticket-perforated-fill"></i>
+                                Request to Join
+                            </a>
+                            <p class="rd-booking-hint">
+                                The driver will review your request before confirming.
+                            </p>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="rd-trust-note">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Travel responsibly. Confirm trip details with your driver.</span>
+                    </div>
+                </section>
+
+                <!-- Driver profile -->
+                <section class="rd-card rd-driver-card">
+                    <span class="rd-driver-label">YOUR RIDE HOST</span>
+
+                    <div class="rd-driver-avatar-wrap">
+                        {% if ride.driver.profile.avatar %}
+                            <img
+                                src="{{ ride.driver.profile.avatar.url }}"
+                                alt="{{ ride.driver.username }}"
+                                class="rd-driver-avatar"
+                            >
+                        {% else %}
+                            <div class="rd-driver-avatar rd-driver-avatar-fallback">
+                                {{ ride.driver.username|make_list|first|upper }}
+                            </div>
+                        {% endif %}
+
+                        {% if ride.driver.profile.is_license_verified %}
+                            <span class="rd-driver-check" title="Driving licence verified">
+                                <i class="bi bi-patch-check-fill"></i>
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <h3>{{ ride.driver.get_full_name|default:ride.driver.username }}</h3>
+                    <p class="rd-driver-description">GoTogether community member</p>
+
+                    <div class="rd-verification-list">
+                        {% if ride.driver.profile.is_license_verified %}
+                            <span class="rd-verify-badge rd-verify-license">
+                                <i class="bi bi-patch-check-fill"></i> DL Verified
+                            </span>
+                        {% endif %}
+
+                        {% if ride.driver.profile.is_phone_verified %}
+                            <span class="rd-verify-badge rd-verify-phone">
+                                <i class="bi bi-phone-fill"></i> Phone Verified
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <a href="{% url 'user_profile' ride.driver.id %}"
+                       class="rd-btn rd-btn-secondary rd-profile-btn">
+                        <i class="bi bi-person-lines-fill"></i>
+                        View Driver Profile
+                    </a>
+                </section>
+
+            </aside>
+        </div>
+    </div>
+</div>
+{% endblock %}

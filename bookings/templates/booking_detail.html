@@ -1,0 +1,442 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Travel Pass #GT-{{ booking.id }} - GoTogether{% endblock %}
+
+{% block content %}
+<div class="bp-page">
+    <div class="bp-container">
+
+        <!-- Page actions -->
+        <div class="bp-toolbar no-print">
+            <a href="{% url 'my_bookings' %}" class="bp-back-link">
+                <i class="bi bi-arrow-left"></i>
+                Back to My Bookings
+            </a>
+
+            <button type="button" class="bp-print-btn" onclick="window.print()">
+                <i class="bi bi-printer"></i>
+                Print / Save Pass
+            </button>
+        </div>
+
+        <!-- Travel pass -->
+        <article class="bp-ticket">
+
+            <!-- Ticket header -->
+            <header class="bp-header">
+                <div class="bp-brand">
+                    <img
+                        src="{% static 'images/gotogetherlogo.png' %}"
+                        alt="GoTogether"
+                        class="bp-logo"
+                    >
+                    <div>
+                        <span class="bp-brand-name">GoTogether</span>
+                        <h1>TRAVEL PASS</h1>
+                        <p>Share the Ride, Share the Journey.</p>
+                    </div>
+                </div>
+
+                <div class="bp-pass-id">
+                    <span>PASS IDENTIFICATION</span>
+                    <strong>GT-{{ booking.ride.departure_date|date:"Ymd" }}-{{ booking.id }}</strong>
+                    <small>Keep this pass for your trip</small>
+                </div>
+
+                <div class="bp-header-decoration" aria-hidden="true"></div>
+            </header>
+
+            <!-- Ticket body -->
+            <div class="bp-body">
+
+                <!-- Booking status -->
+                <div class="bp-status-row">
+                    <div>
+                        <span class="bp-label">BOOKING STATUS</span>
+
+                        {% if booking.status == 'ACCEPTED' %}
+                            <span class="bp-status bp-status-accepted">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Confirmed
+                            </span>
+                        {% elif booking.status == 'PENDING' %}
+                            <span class="bp-status bp-status-pending">
+                                <i class="bi bi-hourglass-split"></i>
+                                Awaiting Driver Confirmation
+                            </span>
+                        {% elif booking.status == 'CANCELLED' %}
+                            <span class="bp-status bp-status-cancelled">
+                                <i class="bi bi-x-circle-fill"></i>
+                                Cancelled
+                            </span>
+                        {% else %}
+                            <span class="bp-status bp-status-other">
+                                {{ booking.get_status_display }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="bp-vehicle-type">
+                        <span class="bp-label">VEHICLE TYPE</span>
+                        {% if booking.ride.vehicle_type == '2_WHEELER' %}
+                            <span class="bp-vehicle-badge bp-bike">
+                                <i class="bi bi-bicycle"></i> 2-Wheeler
+                            </span>
+                        {% else %}
+                            <span class="bp-vehicle-badge bp-car">
+                                <i class="bi bi-car-front-fill"></i> 4-Wheeler
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Route -->
+                <section class="bp-route-section">
+                    <div class="bp-section-heading">
+                        <span class="bp-section-number">01</span>
+                        <div>
+                            <h2>Your Journey</h2>
+                            <p>Pickup to destination</p>
+                        </div>
+                    </div>
+
+                    <div class="bp-route">
+                        <div class="bp-route-point">
+                            <div class="bp-route-marker bp-marker-start">
+                                <i class="bi bi-circle-fill"></i>
+                            </div>
+                            <div class="bp-route-details">
+                                <span class="bp-label">PICKUP LOCATION</span>
+                                <h3>{{ booking.ride.source_city }}</h3>
+                                <p>
+                                    <i class="bi bi-geo-alt"></i>
+                                    {{ booking.ride.pickup_point|default:"Not specified" }}
+                                </p>
+
+                                {% if booking.pickup_note %}
+                                    <div class="bp-pickup-note">
+                                        <i class="bi bi-info-circle"></i>
+                                        {{ booking.pickup_note }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <span class="bp-route-tag">START</span>
+                        </div>
+
+                        <div class="bp-route-connector">
+                            <span></span>
+                            <small>YOUR SHARED RIDE</small>
+                        </div>
+
+                        <div class="bp-route-point">
+                            <div class="bp-route-marker bp-marker-end">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <div class="bp-route-details">
+                                <span class="bp-label">DESTINATION</span>
+                                <h3>{{ booking.ride.destination_city }}</h3>
+                                <p>
+                                    <i class="bi bi-geo-alt"></i>
+                                    {{ booking.ride.drop_point|default:"Not specified" }}
+                                </p>
+                            </div>
+                            <span class="bp-route-tag">END</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Travel information -->
+                <section class="bp-travel-info">
+                    <div class="bp-info-item">
+                        <div class="bp-info-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <span class="bp-label">TRAVEL DATE</span>
+                        <strong>{{ booking.ride.departure_date|date:"D, d M Y" }}</strong>
+                    </div>
+
+                    <div class="bp-info-item">
+                        <div class="bp-info-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <span class="bp-label">DEPARTURE TIME</span>
+                        <strong class="bp-time">
+                            {{ booking.ride.departure_time|time:"H:i" }} hrs
+                        </strong>
+                    </div>
+
+                    <div class="bp-info-item">
+                        <div class="bp-info-icon">
+                            <i class="bi bi-car-front"></i>
+                        </div>
+                        <span class="bp-label">VEHICLE</span>
+                        <strong>{{ booking.ride.vehicle_model|default:"Not specified" }}</strong>
+                        <small>{{ booking.ride.vehicle_number|default:"Not provided" }}</small>
+                    </div>
+                </section>
+
+                <!-- Driver and passenger -->
+                <section class="bp-people-section">
+                    <div class="bp-section-heading">
+                        <span class="bp-section-number">02</span>
+                        <div>
+                            <h2>Travel Companions</h2>
+                            <p>Driver and passenger information</p>
+                        </div>
+                    </div>
+
+                    <div class="bp-people-grid">
+
+                        <!-- Driver -->
+                        <div class="bp-person-card">
+                            <span class="bp-person-role">
+                                <i class="bi bi-steering-wheel"></i>
+                                RIDE HOST / DRIVER
+                            </span>
+
+                            <div class="bp-person-main">
+                                <div class="bp-person-avatar">
+                                    {{ booking.ride.driver.username|make_list|first|upper }}
+                                </div>
+                                <div class="bp-person-name">
+                                    <strong>
+                                        {{ booking.ride.driver.get_full_name|default:booking.ride.driver.username }}
+                                    </strong>
+                                    {% if booking.ride.driver.profile.is_license_verified %}
+                                        <span class="bp-verified">
+                                            <i class="bi bi-patch-check-fill"></i>
+                                            DL Verified
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if booking.status == 'ACCEPTED' %}
+                                {% if booking.ride.driver.profile.phone_number %}
+                                    <a href="tel:{{ booking.ride.driver.profile.phone_number }}"
+                                       class="bp-contact-btn no-print">
+                                        <i class="bi bi-telephone-fill"></i>
+                                        Call Driver
+                                    </a>
+                                    <p class="bp-phone-print print-only">
+                                        Phone: {{ booking.ride.driver.profile.phone_number }}
+                                    </p>
+                                {% else %}
+                                    <p class="bp-contact-unavailable">
+                                        Driver contact number is not available.
+                                    </p>
+                                {% endif %}
+                            {% else %}
+                                <p class="bp-contact-locked">
+                                    <i class="bi bi-lock-fill"></i>
+                                    Driver contact is available after acceptance.
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Passenger -->
+                        <div class="bp-person-card">
+                            <span class="bp-person-role">
+                                <i class="bi bi-person-fill"></i>
+                                PASSENGER
+                            </span>
+
+                            <div class="bp-person-main">
+                                <div class="bp-person-avatar bp-passenger-avatar">
+                                    {{ booking.passenger.username|make_list|first|upper }}
+                                </div>
+                                <div class="bp-person-name">
+                                    <strong>
+                                        {{ booking.passenger.get_full_name|default:booking.passenger.username }}
+                                    </strong>
+                                    <span class="bp-passenger-seats">
+                                        {{ booking.seats_booked }}
+                                        seat{{ booking.seats_booked|pluralize }} reserved
+                                    </span>
+                                </div>
+                            </div>
+
+                            {% if booking.status == 'ACCEPTED' %}
+                                {% if booking.passenger.profile.phone_number %}
+                                    <a href="tel:{{ booking.passenger.profile.phone_number }}"
+                                       class="bp-contact-btn bp-contact-passenger no-print">
+                                        <i class="bi bi-telephone-fill"></i>
+                                        Call Passenger
+                                    </a>
+                                    <p class="bp-phone-print print-only">
+                                        Phone: {{ booking.passenger.profile.phone_number }}
+                                    </p>
+                                {% else %}
+                                    <p class="bp-contact-unavailable">
+                                        Passenger contact number is not available.
+                                    </p>
+                                {% endif %}
+                            {% else %}
+                                <p class="bp-contact-locked">
+                                    <i class="bi bi-lock-fill"></i>
+                                    Contact details are available after acceptance.
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Safety and shared driving -->
+                <section class="bp-safety-section">
+                    <div class="bp-section-heading">
+                        <span class="bp-section-number">03</span>
+                        <div>
+                            <h2>Safety &amp; Travel Preferences</h2>
+                            <p>Important details for your trip</p>
+                        </div>
+                    </div>
+
+                    <div class="bp-safety-grid">
+                        {% if booking.ride.is_two_wheeler %}
+                            <div class="bp-safety-item">
+                                <i class="bi bi-shield-check"></i>
+                                <div>
+                                    <strong>Helmet Safety</strong>
+                                    <span>Certified helmets are compulsory for the driver and passenger.</span>
+                                    {% if booking.ride.has_spare_helmet %}
+                                        <small class="bp-safety-positive">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            Spare helmet reported by driver
+                                        </small>
+                                    {% else %}
+                                        <small class="bp-safety-warning">
+                                            <i class="bi bi-exclamation-triangle-fill"></i>
+                                            Bring your own certified helmet
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="bp-safety-item">
+                            {% if booking.willing_to_swap_driving %}
+                                <i class="bi bi-arrow-left-right"></i>
+                                <div>
+                                    <strong>Shared Driving</strong>
+                                    <span>Passenger indicated willingness to share driving duties.</span>
+                                    <small class="bp-safety-positive">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Preference recorded
+                                    </small>
+                                </div>
+                            {% else %}
+                                <i class="bi bi-person"></i>
+                                <div>
+                                    <strong>Standard Passenger Travel</strong>
+                                    <span>No shared-driving preference was recorded for this booking.</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Fare breakdown -->
+                <section class="bp-fare-section">
+                    <div class="bp-fare-details">
+                        <span class="bp-label">YOUR TRAVEL CONTRIBUTION</span>
+                        <h2>Total Fuel Share</h2>
+                        <p>
+                            {{ booking.seats_booked }} seat{{ booking.seats_booked|pluralize }}
+                            × ₹{{ booking.ride.cost_per_seat }}
+                        </p>
+                        <small>Confirm payment arrangements with the driver.</small>
+                    </div>
+
+                    <div class="bp-total-fare">
+                        <span>TOTAL</span>
+                        <strong>₹{{ booking.total_fare }}</strong>
+                    </div>
+                </section>
+
+                <!-- Ticket footer -->
+                <footer class="bp-ticket-footer">
+                    <div class="bp-footer-brand">
+                        <i class="bi bi-signpost-split-fill"></i>
+                        <span>GoTogether</span>
+                    </div>
+                    <p>Travel together. Share responsibly.</p>
+                    <span class="bp-footer-id">GT-{{ booking.id }}</span>
+                </footer>
+            </div>
+        </article>
+
+        <!-- Review section -->
+        {% if booking.status == 'ACCEPTED' %}
+            <section class="bp-review-card no-print">
+                <div class="bp-review-heading">
+                    <div class="bp-review-icon">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <div>
+                        <h2>Rate Your Co-Traveler</h2>
+                        <p>Help other members make informed travel decisions.</p>
+                    </div>
+                </div>
+
+                {% if user_review %}
+                    <div class="bp-existing-review">
+                        <div class="bp-review-stars">
+                            {% for star in "12345" %}
+                                {% if forloop.counter <= user_review.rating %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <strong>Your Review · {{ user_review.rating }}/5</strong>
+                        <p>{{ user_review.comment|default:"No written comment provided." }}</p>
+                    </div>
+                {% else %}
+                    <p class="bp-review-description">
+                        Share feedback about punctuality, safety and driving experience.
+                    </p>
+
+                    <form action="{% url 'add_review' booking.id %}"
+                          method="POST"
+                          class="bp-review-form">
+                        {% csrf_token %}
+
+                        <div class="bp-form-group">
+                            <label for="{{ review_form.rating.id_for_label }}">
+                                Star Rating
+                            </label>
+                            {{ review_form.rating }}
+                            {% if review_form.rating.errors %}
+                                <div class="bp-form-error">
+                                    {{ review_form.rating.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="bp-form-group">
+                            <label for="{{ review_form.comment.id_for_label }}">
+                                Your Feedback
+                            </label>
+                            {{ review_form.comment }}
+                            {% if review_form.comment.errors %}
+                                <div class="bp-form-error">
+                                    {{ review_form.comment.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="bp-print-btn bp-submit-review">
+                            <i class="bi bi-send-fill"></i>
+                            Submit Review
+                        </button>
+                    </form>
+                {% endif %}
+            </section>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

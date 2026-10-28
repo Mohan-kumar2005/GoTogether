@@ -1,0 +1,157 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In - GoTogether{% endblock %}
+
+{% block content %}
+<main class="login-page">
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <!-- HEADER -->
+            <div class="login-header">
+                <img
+                    src="{% static 'images/gotogetherlogo.png' %}"
+                    alt="GoTogether Logo"
+                    class="login-logo"
+                >
+
+                <div class="login-welcome-icon">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+
+                <p class="login-eyebrow">WELCOME BACK</p>
+
+                <h1>Good to see <span>you.</span></h1>
+
+                <p class="login-description">
+                    Sign in to coordinate rides, manage requests, and
+                    travel home together.
+                </p>
+            </div>
+
+            <!-- DJANGO MESSAGES -->
+            {% if messages %}
+                <div class="login-messages" aria-live="polite">
+                    {% for message in messages %}
+                        <div class="login-alert {{ message.tags }}">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- LOGIN FORM -->
+            <form
+                id="loginForm"
+                action="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
+                method="POST"
+            >
+                {% csrf_token %}
+
+                <div class="login-field">
+                    <label for="loginUsername">
+                        Username or mobile number
+                        <span>*</span>
+                    </label>
+
+                    <div class="login-input-wrapper">
+                        <i class="bi bi-person-fill login-input-icon"></i>
+
+                        <input
+                            type="text"
+                            id="loginUsername"
+                            name="username"
+                            placeholder="Enter username or registered mobile"
+                            autocomplete="username"
+                            maxlength="254"
+                            required
+                            autofocus
+                        >
+                    </div>
+                </div>
+
+                <div class="login-field">
+                    <label for="loginPassword">
+                        Password
+                        <span>*</span>
+                    </label>
+
+                    <div class="login-input-wrapper">
+                        <i class="bi bi-lock-fill login-input-icon"></i>
+
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="login-password-toggle"
+                            id="togglePassword"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            <i class="bi bi-eye" id="passwordEyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REMEMBER: authentication is handled by Django -->
+                <button
+                    type="submit"
+                    class="login-submit-btn"
+                    id="loginSubmit"
+                >
+                    <span>
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Sign in to GoTogether
+                    </span>
+
+                    <i class="bi bi-arrow-right login-submit-arrow"></i>
+                </button>
+            </form>
+
+            <!-- SIGNUP LINK -->
+            <div class="login-signup">
+                <p>New to GoTogether?</p>
+
+                <a href="{% url 'signup' %}">
+                    Create an account with OTP
+                    <i class="bi bi-arrow-up-right"></i>
+                </a>
+            </div>
+
+            <!-- SECURITY NOTE -->
+            <div class="login-security">
+                <i class="bi bi-shield-lock-fill"></i>
+                <span>Your account is protected by secure sign-in.</span>
+            </div>
+
+            <!-- BRAND FOOTER -->
+            <div class="login-brand-footer">
+                <span></span>
+                <p>Share the Ride, Share the Journey.</p>
+                <span></span>
+            </div>
+
+        </div>
+
+        <p class="login-page-caption">
+            Find your route. Meet your travel companions.
+        </p>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/script.js' %}" defer></script>
+{% endblock %}

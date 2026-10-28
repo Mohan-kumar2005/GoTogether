@@ -1,0 +1,331 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact & Safety Support - GoTogether{% endblock %}
+
+{% block content %}
+<main class="contact-page">
+    <div class="contact-container">
+
+        <div class="contact-grid">
+
+            <!-- LEFT: CONTACT FORM -->
+            <section class="contact-main">
+                <div class="contact-brand">
+                    <img
+                        src="{% static 'images/gotogetherlogo.png' %}"
+                        alt="GoTogether logo"
+                        class="contact-logo"
+                    >
+                    <span class="support-badge">
+                        <span class="status-dot"></span>
+                        SUPPORT & HELPLINE
+                    </span>
+                </div>
+
+                <p class="contact-eyebrow">WE ARE HERE TO HELP</p>
+
+                <h1 class="contact-title">
+                    Get in touch <span>with us.</span>
+                </h1>
+
+                <p class="contact-description">
+                    Have a question about sharing a ride, driver verification,
+                    or planning your next trip? Send us a message and our team
+                    will help you.
+                </p>
+
+                {% if messages %}
+                    <div class="contact-messages" aria-live="polite">
+                        {% for message in messages %}
+                            <div class="contact-alert {{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="contact-form-card">
+                    <div class="contact-form-heading">
+                        <div class="contact-heading-icon">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </div>
+                        <div>
+                            <h2>Send us a message</h2>
+                            <p>Fields marked * are required.</p>
+                        </div>
+                    </div>
+
+                    <form
+                        id="contactForm"
+                        action="{% url 'contact' %}"
+                        method="POST"
+                    >
+                        {% csrf_token %}
+
+                        <div class="contact-form-grid">
+
+                            <div class="contact-field">
+                                <label for="contactName">Your name *</label>
+                                <input
+                                    type="text"
+                                    id="contactName"
+                                    name="name"
+                                    maxlength="150"
+                                    required
+                                    autocomplete="name"
+                                    placeholder="Enter your full name"
+                                    value="{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% endif %}"
+                                >
+                            </div>
+
+                            <div class="contact-field">
+                                <label for="contactEmail">Email address *</label>
+                                <input
+                                    type="email"
+                                    id="contactEmail"
+                                    name="email"
+                                    maxlength="254"
+                                    required
+                                    autocomplete="email"
+                                    placeholder="you@example.com"
+                                    value="{% if user.is_authenticated %}{{ user.email }}{% endif %}"
+                                >
+                            </div>
+
+                            <div class="contact-field">
+                                <label for="contactPhone">Mobile number</label>
+                                <input
+                                    type="tel"
+                                    id="contactPhone"
+                                    name="phone"
+                                    maxlength="15"
+                                    autocomplete="tel"
+                                    placeholder="Enter your mobile number"
+                                    pattern="[0-9+() -]{7,15}"
+                                >
+                                <small>Include your country code if needed.</small>
+                            </div>
+
+                            <div class="contact-field">
+                                <label for="contactSubject">Subject *</label>
+                                <input
+                                    type="text"
+                                    id="contactSubject"
+                                    name="subject"
+                                    maxlength="200"
+                                    required
+                                    placeholder="How can we help?"
+                                >
+                            </div>
+
+                            <div class="contact-field contact-field-full">
+                                <label for="contactMessage">Your message *</label>
+                                <textarea
+                                    id="contactMessage"
+                                    name="message"
+                                    rows="5"
+                                    maxlength="5000"
+                                    required
+                                    placeholder="Tell us how we can help you..."
+                                ></textarea>
+
+                                <div class="contact-message-footer">
+                                    <small>Please do not include passwords or OTPs.</small>
+                                    <small><span id="messageCount">0</span>/5000</small>
+                                </div>
+                            </div>
+
+                            <div class="contact-field-full">
+                                <button
+                                    type="submit"
+                                    class="contact-submit-btn"
+                                    id="contactSubmit"
+                                >
+                                    <span class="submit-label">
+                                        <i class="bi bi-send-fill"></i>
+                                        Send message
+                                    </span>
+                                    <i class="bi bi-arrow-up-right submit-arrow"></i>
+                                </button>
+                                <p class="contact-privacy-note">
+                                    <i class="bi bi-shield-lock-fill"></i>
+                                    Your information will be handled responsibly.
+                                </p>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+                <div class="contact-bottom-note">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Need urgent assistance? Use the emergency contacts on this page.</span>
+                </div>
+            </section>
+
+            <!-- RIGHT: SAFETY INFORMATION -->
+            <aside class="contact-sidebar">
+
+                <!-- EMERGENCY HOTLINES -->
+                <section class="emergency-card">
+                    <div class="emergency-heading">
+                        <div class="emergency-icon">
+                            <i class="bi bi-telephone-inbound-fill"></i>
+                        </div>
+                        <div>
+                            <p class="emergency-eyebrow">KEEP THESE HANDY</p>
+                            <h2>Emergency contacts</h2>
+                        </div>
+                    </div>
+
+                    <p class="emergency-description">
+                        If you are in immediate danger, contact the appropriate
+                        emergency service.
+                    </p>
+
+                    <div class="emergency-list">
+
+                        <a class="emergency-item" href="tel:112">
+                            <span class="emergency-item-icon">
+                                <i class="bi bi-shield-fill-check"></i>
+                            </span>
+                            <span class="emergency-item-text">
+                                <strong>National emergency</strong>
+                                <small>Police, fire and emergency assistance</small>
+                            </span>
+                            <span class="emergency-number">112</span>
+                        </a>
+
+                        <a class="emergency-item" href="tel:108">
+                            <span class="emergency-item-icon">
+                                <i class="bi bi-heart-pulse-fill"></i>
+                            </span>
+                            <span class="emergency-item-text">
+                                <strong>Medical ambulance</strong>
+                                <small>Emergency medical assistance</small>
+                            </span>
+                            <span class="emergency-number">108</span>
+                        </a>
+
+                        <a class="emergency-item" href="tel:181">
+                            <span class="emergency-item-icon">
+                                <i class="bi bi-person-heart"></i>
+                            </span>
+                            <span class="emergency-item-text">
+                                <strong>Women helpline</strong>
+                                <small>Women in distress</small>
+                            </span>
+                            <span class="emergency-number">181</span>
+                        </a>
+
+                        <a class="emergency-item" href="tel:1033">
+                            <span class="emergency-item-icon">
+                                <i class="bi bi-signpost-split-fill"></i>
+                            </span>
+                            <span class="emergency-item-text">
+                                <strong>National highway helpline</strong>
+                                <small>Highway assistance</small>
+                            </span>
+                            <span class="emergency-number">1033</span>
+                        </a>
+
+                    </div>
+
+                    <p class="emergency-disclaimer">
+                        <i class="bi bi-info-circle"></i>
+                        Availability and service coverage may vary. For immediate
+                        danger in India, call 112.
+                    </p>
+                </section>
+
+                <!-- SAFETY RULES -->
+                <section class="safety-card">
+                    <div class="safety-heading">
+                        <div class="safety-heading-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <p class="safety-eyebrow">TRAVEL SMART</p>
+                            <h2>Your safety matters</h2>
+                        </div>
+                    </div>
+
+                    <div class="safety-list">
+
+                        <div class="safety-item">
+                            <span class="safety-check">
+                                <i class="bi bi-check-lg"></i>
+                            </span>
+                            <div>
+                                <h3>Wear a helmet</h3>
+                                <p>
+                                    Both rider and pillion should wear properly
+                                    fastened, compliant helmets.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="safety-item">
+                            <span class="safety-check">
+                                <i class="bi bi-check-lg"></i>
+                            </span>
+                            <div>
+                                <h3>Verify the driver</h3>
+                                <p>
+                                    Check the driver's identity and valid driving
+                                    licence before starting your trip.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="safety-item">
+                            <span class="safety-check">
+                                <i class="bi bi-check-lg"></i>
+                            </span>
+                            <div>
+                                <h3>Share your trip</h3>
+                                <p>
+                                    Tell a trusted person your route, travel time
+                                    and vehicle details.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="safety-item">
+                            <span class="safety-check">
+                                <i class="bi bi-check-lg"></i>
+                            </span>
+                            <div>
+                                <h3>Agree on costs</h3>
+                                <p>
+                                    Confirm the contribution, destination and
+                                    other arrangements before departure.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- BRAND MESSAGE -->
+                <div class="contact-brand-note">
+                    <div class="brand-note-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <h3>Better journeys, together.</h3>
+                        <p>Share the ride. Share the cost. Travel responsibly.</p>
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/script.js' %}" defer></script>
+{% endblock %}

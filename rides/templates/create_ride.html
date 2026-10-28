@@ -1,0 +1,361 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Publish a Ride - GoTogether{% endblock %}
+
+{% block content %}
+<div class="container py-5 create-ride-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="gt-card create-ride-card p-4 p-md-5">
+
+                <!-- Header -->
+                <div class="create-ride-header d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4 pb-4">
+                    <div class="create-ride-heading">
+                        <span class="create-ride-eyebrow">
+                            <i class="bi bi-fuel-pump-fill me-1"></i>
+                            FESTIVAL COST-SHARING
+                        </span>
+
+                        <h2 class="fw-bold text-white mt-3 mb-2">
+                            Offer a Ride & Split Fuel Costs
+                        </h2>
+
+                        <p class="create-ride-muted mb-0">
+                            Share your journey, split petrol expenses, and travel together safely.
+                        </p>
+                    </div>
+
+                    <img
+                        src="{% static 'images/gotogetherlogo.png' %}"
+                        alt="GoTogether"
+                        class="create-ride-logo"
+                    >
+                </div>
+
+                <!-- General form errors -->
+                {% if form.non_field_errors %}
+                    <div class="create-ride-error-summary mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form
+                    action="{% url 'create_ride' %}"
+                    method="POST"
+                    id="createRideForm"
+                >
+                    {% csrf_token %}
+
+                    <!-- Route and Timings -->
+                    <section class="create-ride-section mb-4">
+                        <div class="create-ride-section-heading">
+                            <span class="create-ride-icon">
+                                <i class="bi bi-signpost-split-fill"></i>
+                            </span>
+                            <div>
+                                <h5>Route & Timings</h5>
+                                <p>Tell passengers where and when you're travelling.</p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label for="{{ form.source_city.id_for_label }}" class="create-ride-label">
+                                    Leaving From (City) *
+                                </label>
+                                {{ form.source_city }}
+                                {{ form.source_city.errors }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.destination_city.id_for_label }}" class="create-ride-label">
+                                    Going To (Destination City) *
+                                </label>
+                                {{ form.destination_city }}
+                                {{ form.destination_city.errors }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.pickup_point.id_for_label }}" class="create-ride-label">
+                                    Pickup Point / Landmark *
+                                </label>
+                                {{ form.pickup_point }}
+                                <small class="create-ride-help">
+                                    Example: Karur Bus Stand, Gandhipuram.
+                                </small>
+                                {{ form.pickup_point.errors }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.drop_point.id_for_label }}" class="create-ride-label">
+                                    Drop Location *
+                                </label>
+                                {{ form.drop_point }}
+                                <small class="create-ride-help">
+                                    Example: Koyambedu, Tambaram.
+                                </small>
+                                {{ form.drop_point.errors }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="{{ form.departure_date.id_for_label }}" class="create-ride-label">
+                                    Departure Date *
+                                </label>
+                                {{ form.departure_date }}
+                                {{ form.departure_date.errors }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="{{ form.departure_time.id_for_label }}" class="create-ride-label">
+                                    Departure Time *
+                                </label>
+                                {{ form.departure_time }}
+                                {{ form.departure_time.errors }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="{{ form.festival.id_for_label }}" class="create-ride-label">
+                                    Festival Tag
+                                </label>
+                                {{ form.festival }}
+                                {{ form.festival.errors }}
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <!-- Vehicle and Seats -->
+                    <section class="create-ride-section mb-4">
+                        <div class="create-ride-section-heading">
+                            <span class="create-ride-icon">
+                                <i class="bi bi-car-front-fill"></i>
+                            </span>
+                            <div>
+                                <h5>Vehicle & Passenger Seats</h5>
+                                <p>Provide your vehicle details and available passenger capacity.</p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-4">
+                                <label for="{{ form.vehicle_type.id_for_label }}" class="create-ride-label">
+                                    Vehicle Type *
+                                </label>
+                                {{ form.vehicle_type }}
+                                {{ form.vehicle_type.errors }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="{{ form.vehicle_model.id_for_label }}" class="create-ride-label">
+                                    Vehicle Make & Model *
+                                </label>
+                                {{ form.vehicle_model }}
+                                {{ form.vehicle_model.errors }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="{{ form.vehicle_number.id_for_label }}" class="create-ride-label">
+                                    Registration Number *
+                                </label>
+                                {{ form.vehicle_number }}
+                                {{ form.vehicle_number.errors }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="{{ form.total_seats.id_for_label }}" class="create-ride-label">
+                                    Available Passenger Seats *
+                                </label>
+                                {{ form.total_seats }}
+                                <small class="create-ride-help" id="seatsHelp">
+                                    Choose your available passenger seats.
+                                </small>
+                                {{ form.total_seats.errors }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="{{ form.estimated_distance_km.id_for_label }}" class="create-ride-label">
+                                    Estimated Distance (km) *
+                                </label>
+                                {{ form.estimated_distance_km }}
+                                {{ form.estimated_distance_km.errors }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="{{ form.luggage_space.id_for_label }}" class="create-ride-label">
+                                    Luggage Allowance
+                                </label>
+                                {{ form.luggage_space }}
+                                {{ form.luggage_space.errors }}
+                            </div>
+                        </div>
+
+                        <!-- Helmet Safety -->
+                        <div id="twoWheelerNotice" class="create-ride-helmet mt-4" hidden>
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="create-ride-helmet-icon">
+                                    <i class="bi bi-shield-fill-check"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">2-Wheeler Helmet Safety</h6>
+                                    <p class="small mb-0">
+                                        A certified helmet must be worn by both rider and passenger.
+                                        Only one pillion passenger is allowed.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-check mt-3">
+                                {{ form.has_spare_helmet }}
+                                <label
+                                    class="form-check-label"
+                                    for="{{ form.has_spare_helmet.id_for_label }}"
+                                >
+                                    I have a spare helmet for the passenger.
+                                </label>
+                                {{ form.has_spare_helmet.errors }}
+                            </div>
+
+                            <div class="form-check mt-2">
+                                {{ form.is_helmet_mandatory }}
+                                <label
+                                    class="form-check-label fw-semibold"
+                                    for="{{ form.is_helmet_mandatory.id_for_label }}"
+                                >
+                                    I agree that helmet use is mandatory throughout the ride.
+                                </label>
+                                {{ form.is_helmet_mandatory.errors }}
+                            </div>
+
+                            <p id="helmetWarning" class="create-ride-inline-warning mt-2 mb-0" hidden>
+                                Please confirm the helmet safety requirements before publishing.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- Fuel Cost Calculator -->
+                    <section class="create-ride-section create-ride-fuel mb-4">
+                        <div class="create-ride-section-heading">
+                            <span class="create-ride-icon">
+                                <i class="bi bi-calculator-fill"></i>
+                            </span>
+                            <div>
+                                <h5>Fair Fuel Cost Split</h5>
+                                <p>Estimate a fair contribution for everyone travelling.</p>
+                            </div>
+                        </div>
+
+                        <div class="create-ride-info mb-3">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Enter the estimated one-way fuel cost. The calculator divides it by
+                            the driver and the planned passenger capacity to estimate each
+                            person's share.
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.total_estimated_fuel_cost.id_for_label }}" class="create-ride-label">
+                                    Estimated Total Fuel Cost (₹)
+                                </label>
+                                {{ form.total_estimated_fuel_cost }}
+                                <small class="create-ride-help">
+                                    Total estimated fuel expense for the journey.
+                                </small>
+                                {{ form.total_estimated_fuel_cost.errors }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.cost_per_seat.id_for_label }}" class="create-ride-label">
+                                    Cost Per Passenger (₹) *
+                                </label>
+                                {{ form.cost_per_seat }}
+                                <small class="create-ride-help">
+                                    Suggested contribution per passenger.
+                                </small>
+                                {{ form.cost_per_seat.errors }}
+                            </div>
+                        </div>
+
+                        <div class="create-ride-calculation mt-4" aria-live="polite">
+                            <span class="create-ride-calculation-label">
+                                Estimated share per person, including driver
+                            </span>
+                            <strong id="fuelSharePreview">₹0.00</strong>
+                            <small id="fuelCalculationNote">
+                                Enter the total fuel cost to calculate an estimate.
+                            </small>
+                        </div>
+                    </section>
+
+                    <!-- Swap Driving -->
+                    <section class="create-ride-section create-ride-swap mb-4">
+                        <div class="create-ride-section-heading">
+                            <span class="create-ride-icon">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </span>
+                            <div>
+                                <h5>Swap Driving (Optional)</h5>
+                                <p>For long journeys where sharing driving duties may help.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-check form-switch create-ride-switch">
+                            {{ form.open_to_swap_driving }}
+                            <label
+                                class="form-check-label"
+                                for="{{ form.open_to_swap_driving.id_for_label }}"
+                            >
+                                I welcome a co-passenger with an appropriate valid driving
+                                license to share driving duties, if suitable.
+                            </label>
+                        </div>
+                        {{ form.open_to_swap_driving.errors }}
+                    </section>
+
+                    <!-- Additional Notes -->
+                    <section class="create-ride-section mb-4">
+                        <div class="create-ride-section-heading">
+                            <span class="create-ride-icon">
+                                <i class="bi bi-chat-left-text-fill"></i>
+                            </span>
+                            <div>
+                                <h5>Additional Preferences</h5>
+                                <p>Share any important details with potential passengers.</p>
+                            </div>
+                        </div>
+
+                        <label for="{{ form.additional_notes.id_for_label }}" class="create-ride-label">
+                            Additional Notes
+                        </label>
+                        {{ form.additional_notes }}
+                        {{ form.additional_notes.errors }}
+                    </section>
+
+                    <!-- Submit -->
+                    <div class="create-ride-submit-area">
+                        <button type="submit" class="btn btn-create-ride w-100" id="publishRideButton">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            Publish Ride & Accept Passengers
+                        </button>
+
+                        <p class="create-ride-footer-note mt-3 mb-0 text-center">
+                            <i class="bi bi-shield-check me-1"></i>
+                            Please confirm your route, costs and safety details before publishing.
+                        </p>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/script.js' %}" defer></script>
+{% endblock %}

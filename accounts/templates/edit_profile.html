@@ -1,0 +1,297 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile & Credentials - GoTogether{% endblock %}
+
+{% block content %}
+<div class="container py-5 edit-profile-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="gt-card edit-profile-card p-4 p-md-5">
+
+                <!-- Header -->
+                <div class="edit-profile-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 pb-4">
+                    <div>
+                        <span class="edit-profile-eyebrow">
+                            <i class="bi bi-person-gear me-1"></i> ACCOUNT SETTINGS
+                        </span>
+
+                        <h3 class="fw-bold text-white mt-2 mb-2">
+                            Edit Profile & Credentials
+                        </h3>
+
+                        <p class="edit-profile-muted small mb-0">
+                            Update your personal details, vehicle and driving credentials.
+                        </p>
+                    </div>
+
+                    <a href="{% url 'profile' %}" class="btn btn-profile-cancel">
+                        <i class="bi bi-arrow-left me-1"></i> Cancel
+                    </a>
+                </div>
+
+                <!-- Form Errors -->
+                {% if form.errors %}
+                    <div class="edit-profile-alert mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Please correct the errors below before saving.
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form action="{% url 'edit_profile' %}"
+                      method="POST"
+                      enctype="multipart/form-data"
+                      id="editProfileForm">
+
+                    {% csrf_token %}
+
+                    <!-- Personal Information -->
+                    <section class="edit-profile-section mb-4">
+                        <div class="edit-profile-section-heading">
+                            <span class="edit-profile-icon">
+                                <i class="bi bi-person-circle"></i>
+                            </span>
+                            <div>
+                                <h5>Personal Information</h5>
+                                <p>Your basic details and travel preferences.</p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label for="{{ form.first_name.id_for_label }}" class="edit-profile-label">
+                                    First Name
+                                </label>
+                                {{ form.first_name }}
+                                {{ form.first_name.errors }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.last_name.id_for_label }}" class="edit-profile-label">
+                                    Last Name
+                                </label>
+                                {{ form.last_name }}
+                                {{ form.last_name.errors }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="edit-profile-label">
+                                    Email Address
+                                </label>
+                                {{ form.email }}
+                                {{ form.email.errors }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.gender.id_for_label }}" class="edit-profile-label">
+                                    Gender
+                                </label>
+                                {{ form.gender }}
+                                {{ form.gender.errors }}
+                            </div>
+
+                            <div class="col-12">
+                                <label for="{{ form.avatar.id_for_label }}" class="edit-profile-label">
+                                    Profile Photo / Avatar
+                                </label>
+
+                                {{ form.avatar }}
+                                {{ form.avatar.errors }}
+
+                                {% if profile.avatar %}
+                                    <div class="edit-profile-current-file mt-2">
+                                        <i class="bi bi-image me-1"></i>
+                                        Current photo:
+                                        <a href="{{ profile.avatar.url }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            View Photo
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12">
+                                <label for="{{ form.bio.id_for_label }}" class="edit-profile-label">
+                                    Bio / Travel Notes
+                                </label>
+
+                                {{ form.bio }}
+                                {{ form.bio.errors }}
+
+                                <div class="edit-profile-help">
+                                    Share your hometown, travel preferences or conversation preferences.
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Driving License -->
+                    <section class="edit-profile-section mb-4">
+                        <div class="edit-profile-section-heading">
+                            <span class="edit-profile-icon">
+                                <i class="bi bi-card-checklist"></i>
+                            </span>
+                            <div>
+                                <h5>Driving License & Swap Driving</h5>
+                                <p>Provide your license details for driver verification.</p>
+                            </div>
+                        </div>
+
+                        <div class="edit-profile-subpanel">
+
+                            <div class="form-check form-switch edit-profile-switch mb-3">
+                                {{ form.has_driving_license }}
+                                <label class="form-check-label" for="{{ form.has_driving_license.id_for_label }}">
+                                    I hold a valid government driving license
+                                </label>
+                                {{ form.has_driving_license.errors }}
+                            </div>
+
+                            <div id="licenseDetailsSection" class="row g-3">
+
+                                <div class="col-md-6">
+                                    <label for="{{ form.driving_license_no.id_for_label }}" class="edit-profile-label">
+                                        Driving License Number
+                                    </label>
+                                    {{ form.driving_license_no }}
+                                    {{ form.driving_license_no.errors }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="{{ form.driving_license_image.id_for_label }}" class="edit-profile-label">
+                                        Upload License Document
+                                    </label>
+                                    {{ form.driving_license_image }}
+                                    {{ form.driving_license_image.errors }}
+
+                                    {% if profile.driving_license_image %}
+                                        <div class="edit-profile-current-file mt-2">
+                                            <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                            Existing license document available
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-check edit-profile-checkbox">
+                                        {{ form.can_swap_drive }}
+                                        <label class="form-check-label" for="{{ form.can_swap_drive.id_for_label }}">
+                                            <i class="bi bi-arrow-left-right me-1"></i>
+                                            I am willing and legally eligible to share driving duties on long journeys.
+                                        </label>
+                                        {{ form.can_swap_drive.errors }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Vehicle Information -->
+                    <section class="edit-profile-section mb-4">
+                        <div class="edit-profile-section-heading">
+                            <span class="edit-profile-icon">
+                                <i class="bi bi-car-front-fill"></i>
+                            </span>
+                            <div>
+                                <h5>Vehicle Information</h5>
+                                <p>Register your bike, scooter or car.</p>
+                            </div>
+                        </div>
+
+                        <div class="edit-profile-subpanel">
+
+                            <div class="form-check form-switch edit-profile-switch mb-3">
+                                {{ form.owns_vehicle }}
+                                <label class="form-check-label" for="{{ form.owns_vehicle.id_for_label }}">
+                                    I own or have access to a 2-wheeler or 4-wheeler
+                                </label>
+                                {{ form.owns_vehicle.errors }}
+                            </div>
+
+                            <div id="vehicleDetailsSection" class="row g-3">
+
+                                <div class="col-md-4">
+                                    <label for="{{ form.vehicle_type.id_for_label }}" class="edit-profile-label">
+                                        Vehicle Category
+                                    </label>
+                                    {{ form.vehicle_type }}
+                                    {{ form.vehicle_type.errors }}
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="{{ form.vehicle_name_model.id_for_label }}" class="edit-profile-label">
+                                        Make & Model
+                                    </label>
+                                    {{ form.vehicle_name_model }}
+                                    {{ form.vehicle_name_model.errors }}
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="{{ form.vehicle_number.id_for_label }}" class="edit-profile-label">
+                                        Registration Number
+                                    </label>
+                                    {{ form.vehicle_number }}
+                                    {{ form.vehicle_number.errors }}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Emergency Contact -->
+                    <section class="edit-profile-section edit-profile-emergency mb-4">
+                        <div class="edit-profile-section-heading">
+                            <span class="edit-profile-icon emergency-icon">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </span>
+                            <div>
+                                <h5>Emergency Contact</h5>
+                                <p>Add someone to contact in an emergency.</p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.emergency_contact_name.id_for_label }}" class="edit-profile-label">
+                                    Contact Person Name
+                                </label>
+                                {{ form.emergency_contact_name }}
+                                {{ form.emergency_contact_name.errors }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.emergency_contact_phone.id_for_label }}" class="edit-profile-label">
+                                    Emergency Phone Number
+                                </label>
+                                {{ form.emergency_contact_phone }}
+                                {{ form.emergency_contact_phone.errors }}
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Submit -->
+                    <div class="edit-profile-actions">
+                        <a href="{% url 'profile' %}" class="btn btn-profile-cancel">
+                            Cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-profile-save" id="saveProfileButton">
+                            <i class="bi bi-check2-circle me-2"></i>
+                            Save Profile & Credentials
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/script.js' %}" defer></script>
+{% endblock %}

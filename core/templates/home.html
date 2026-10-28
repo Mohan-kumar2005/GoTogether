@@ -1,0 +1,480 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}GoTogether | Share Rides, Split Costs, Reach Home{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="home-hero">
+    <div class="hero-glow hero-glow-one"></div>
+    <div class="hero-glow hero-glow-two"></div>
+
+    <div class="container hero-container">
+
+        <div class="hero-logo-frame">
+            <img src="{% static 'images/gotogetherlogo.png' %}"
+                 alt="GoTogether Logo"
+                 class="hero-center-logo">
+        </div>
+
+        <div class="hero-badge">
+            <i class="bi bi-stars"></i>
+            FESTIVAL & HOMETOWN TRAVEL
+            <i class="bi bi-stars"></i>
+        </div>
+
+        <h1 class="hero-title">
+            Your Journey.<br>
+            <span>Our Togetherness.</span>
+        </h1>
+
+        <p class="hero-description">
+            Heading home for Pongal, Diwali, or a weekend?
+            Connect with fellow travellers, share available seats,
+            split travel costs, and make every journey more affordable.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{% url 'find_ride' %}" class="btn btn-primary-gt btn-lg">
+                <i class="bi bi-search"></i> Find a Ride
+            </a>
+
+            <a href="{% url 'create_ride' %}" class="btn btn-outline-gt btn-lg">
+                <i class="bi bi-plus-circle"></i> Publish a Ride
+            </a>
+        </div>
+
+        <div class="hero-features">
+            <span><i class="bi bi-shield-check"></i> Safety-focused travel</span>
+            <span><i class="bi bi-bicycle"></i> Bike pooling</span>
+            <span><i class="bi bi-car-front-fill"></i> Carpooling</span>
+            <span><i class="bi bi-wallet2"></i> Shared travel costs</span>
+        </div>
+    </div>
+</section>
+
+<!-- SEARCH -->
+<section class="container home-search-section">
+    <div class="home-search-card">
+
+        <span class="section-eyebrow">
+            <i class="bi bi-compass"></i> START YOUR JOURNEY
+        </span>
+
+        <h2>Where are you heading?</h2>
+        <p class="section-description">
+            Enter your route and discover available rides.
+        </p>
+
+        <form action="{% url 'find_ride' %}" method="GET">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-lg-3 col-md-6">
+                    <label for="source" class="form-label">Leaving From</label>
+                    <input id="source" type="text" name="source"
+                           class="form-control"
+                           placeholder="e.g. Karur"
+                           value="{{ request.GET.source }}">
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label for="destination" class="form-label">Going To</label>
+                    <input id="destination" type="text" name="destination"
+                           class="form-control"
+                           placeholder="e.g. Chennai"
+                           value="{{ request.GET.destination }}">
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label for="travel-date" class="form-label">Travel Date</label>
+                    <input id="travel-date" type="date" name="date"
+                           class="form-control"
+                           value="{{ request.GET.date }}">
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label for="vehicle-type" class="form-label">Vehicle</label>
+                    <select id="vehicle-type" name="vehicle_type"
+                            class="form-select">
+                        <option value="">All Vehicles</option>
+                        <option value="2_WHEELER"
+                            {% if request.GET.vehicle_type == '2_WHEELER' %}selected{% endif %}>
+                            2-Wheeler
+                        </option>
+                        <option value="4_WHEELER"
+                            {% if request.GET.vehicle_type == '4_WHEELER' %}selected{% endif %}>
+                            4-Wheeler
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+                    <button type="submit"
+                            class="btn btn-primary-gt w-100 search-submit">
+                        <i class="bi bi-search"></i> Find Rides
+                    </button>
+                </div>
+            </div>
+
+            <div class="quick-routes">
+                <span class="quick-routes-label">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    Popular routes
+                </span>
+
+                {% for route in QUICK_ROUTES %}
+                    <a class="route-chip"
+                       href="{% url 'find_ride' %}?source={{ route.from|urlencode }}&destination={{ route.to|urlencode }}&vehicle_type={{ route.type|urlencode }}">
+                        {% if route.type == '2_WHEELER' %}
+                            <i class="bi bi-bicycle"></i>
+                        {% else %}
+                            <i class="bi bi-car-front"></i>
+                        {% endif %}
+                        {{ route.from }} → {{ route.to }}
+                    </a>
+                {% empty %}
+                    <a class="route-chip"
+                       href="{% url 'find_ride' %}?source=Karur&destination=Chennai">
+                        Karur → Chennai
+                    </a>
+                    <a class="route-chip"
+                       href="{% url 'find_ride' %}?source=Coimbatore&destination=Karur&vehicle_type=2_WHEELER">
+                        Coimbatore → Karur
+                    </a>
+                    <a class="route-chip"
+                       href="{% url 'find_ride' %}?source=Chennai&destination=Trichy">
+                        Chennai → Trichy
+                    </a>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="container home-section">
+    <div class="section-heading text-center">
+        <span class="section-eyebrow">WHY GO TOGETHER?</span>
+        <h2>Travel smarter. <span>Spend less.</span></h2>
+        <p>Make every journey more convenient by travelling together.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <article class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+                <h3>Share Travel Costs</h3>
+                <p>
+                    Share agreed travel expenses with fellow passengers
+                    instead of travelling alone.
+                </p>
+            </article>
+        </div>
+
+        <div class="col-md-4">
+            <article class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <h3>Find Travel Partners</h3>
+                <p>
+                    Connect with people travelling along similar routes
+                    and coordinate your journey.
+                </p>
+            </article>
+        </div>
+
+        <div class="col-md-4">
+            <article class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3>Put Safety First</h3>
+                <p>
+                    Follow road safety rules, verify relevant details,
+                    and communicate before travelling.
+                </p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- VEHICLES -->
+<section class="vehicle-section home-section">
+    <div class="container">
+
+        <div class="section-heading text-center">
+            <span class="section-eyebrow">CHOOSE YOUR RIDE</span>
+            <h2>One destination. <span>Different journeys.</span></h2>
+            <p>Choose a vehicle that suits your journey.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <article class="vehicle-card bike-card">
+                    <div class="vehicle-icon">
+                        <i class="bi bi-bicycle"></i>
+                    </div>
+
+                    <span class="vehicle-tag">2-WHEELER</span>
+                    <h3>Bike </h3>
+
+                    <p>
+                        Discover suitable bike rides for nearby destinations.
+                        Riders and passengers must follow applicable helmet
+                        and passenger safety requirements.
+                    </p>
+
+                    <a href="{% url 'find_ride' %}?vehicle_type=2_WHEELER"
+                       class="btn btn-outline-gt">
+                        Explore Bike Rides <i class="bi bi-arrow-right"></i>
+                    </a>
+                </article>
+            </div>
+
+            <div class="col-md-6">
+                <article class="vehicle-card car-card">
+                    <div class="vehicle-icon">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+
+                    <span class="vehicle-tag">4-WHEELER</span>
+                    <h3>Car</h3>
+
+                    <p>
+                        Discover car rides for hometown trips, weekends,
+                        and longer journeys. Agree on the route, available
+                        seats, and shared expenses before travelling.
+                    </p>
+
+                    <a href="{% url 'find_ride' %}?vehicle_type=4_WHEELER"
+                       class="btn btn-outline-gt">
+                        Explore Car Rides <i class="bi bi-arrow-right"></i>
+                    </a>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED RIDES -->
+<section class="container home-section">
+
+    <div class="section-heading ride-section-heading">
+        <div>
+            <span class="section-eyebrow">YOUR NEXT ADVENTURE</span>
+            <h2>Upcoming Rides</h2>
+            <p>Explore journeys shared by other travellers.</p>
+        </div>
+
+        <a href="{% url 'find_ride' %}" class="btn btn-outline-gt">
+            View All Rides <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    {% if featured_rides %}
+        <div class="row g-4">
+            {% for ride in featured_rides %}
+                <div class="col-lg-4 col-md-6">
+                    <article class="ride-item-card h-100">
+
+                        <div class="ride-card-top">
+                            {% if ride.vehicle_type == '2_WHEELER' %}
+                                <span class="badge-bike">
+                                    <i class="bi bi-bicycle"></i> 2-Wheeler
+                                </span>
+                            {% else %}
+                                <span class="badge-car">
+                                    <i class="bi bi-car-front-fill"></i> 4-Wheeler
+                                </span>
+                            {% endif %}
+
+                            {% if ride.festival and ride.festival != 'NONE' %}
+                                <span class="badge-festival">
+                                    {{ ride.get_festival_display }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="timeline-route">
+                            <div class="route-point">
+                                <span class="point-dot start"></span>
+                                <div class="route-details">
+                                    <span class="route-label">FROM</span>
+                                    <h4>{{ ride.source_city }}</h4>
+                                    {% if ride.pickup_point %}
+                                        <p>{{ ride.pickup_point }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="route-connector"></div>
+
+                            <div class="route-point">
+                                <span class="point-dot end"></span>
+                                <div class="route-details">
+                                    <span class="route-label">TO</span>
+                                    <h4>{{ ride.destination_city }}</h4>
+                                    {% if ride.drop_point %}
+                                        <p>{{ ride.drop_point }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ride-highlights">
+                            {% if ride.is_two_wheeler %}
+                                <span class="ride-highlight">
+                                    <i class="bi bi-shield-check"></i>
+                                    Helmet required
+                                </span>
+                            {% endif %}
+
+                            {% if ride.open_to_swap_driving %}
+                                <span class="ride-highlight">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                    Open to driver sharing
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="ride-card-bottom">
+                            <div class="driver-info">
+                                {% if ride.driver.profile.avatar %}
+                                    <img src="{{ ride.driver.profile.avatar.url }}"
+                                         alt="{{ ride.driver.username }}"
+                                         class="avatar-sm">
+                                {% else %}
+                                    <span class="avatar-sm avatar-initial">
+                                        {{ ride.driver.username|make_list|first|upper }}
+                                    </span>
+                                {% endif %}
+
+                                <div class="driver-details">
+                                    <strong>
+                                        {{ ride.driver.first_name|default:ride.driver.username }}
+                                    </strong>
+                                    <span>{{ ride.departure_date|date:"D, d M" }}</span>
+                                    <span>{{ ride.departure_time|time:"H:i" }}</span>
+                                </div>
+                            </div>
+
+                            <div class="ride-price">
+                                <strong>₹{{ ride.cost_per_seat }}</strong>
+                                <span>
+                                    {{ ride.available_seats }}
+                                    seat{{ ride.available_seats|pluralize }} left
+                                </span>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'ride_details' ride.id %}"
+                           class="btn btn-outline-gt ride-view-btn">
+                            View Ride <i class="bi bi-arrow-right"></i>
+                        </a>
+
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="empty-rides">
+            <i class="bi bi-calendar-x"></i>
+            <h3>No rides available yet</h3>
+            <p>Be the first to publish a ride for your upcoming trip.</p>
+            <a href="{% url 'create_ride' %}" class="btn btn-primary-gt">
+                <i class="bi bi-plus-circle"></i> Offer a Ride
+            </a>
+        </div>
+    {% endif %}
+</section>
+
+<!-- SAFETY -->
+<section class="safety-section home-section">
+    <div class="container">
+
+        <div class="section-heading text-center">
+            <span class="section-eyebrow">COMMUNITY TRUST</span>
+            <h2>Safety <span>comes first.</span></h2>
+            <p>Make informed choices before every journey.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <article class="safety-card">
+                    <i class="bi bi-envelope-check-fill"></i>
+                    <h3>Email Verification</h3>
+                    <p>Verify your account using the configured email OTP process.</p>
+                </article>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <article class="safety-card">
+                    <i class="bi bi-person-vcard-fill"></i>
+                    <h3>License Checks</h3>
+                    <p>Check the driver's license and verification status before travelling.</p>
+                </article>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <article class="safety-card">
+                    <i class="bi bi-shield-fill-check"></i>
+                    <h3>Helmet Safety</h3>
+                    <p>Use appropriate helmets and follow applicable road safety laws.</p>
+                </article>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <article class="safety-card">
+                    <i class="bi bi-cup-hot-fill"></i>
+                    <h3>Rest Breaks</h3>
+                    <p>Plan breaks and never drive when tired or unfit to drive.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CALL TO ACTION -->
+<section class="container home-section">
+    <div class="home-cta">
+
+        <img src="{% static 'images/gotogetherlogo.png' %}"
+             alt="GoTogether Logo"
+             class="cta-logo">
+
+        <span class="section-eyebrow">YOUR JOURNEY STARTS HERE</span>
+
+        <h2>Let's get you <span>home together.</span></h2>
+
+        <p>
+            Share your journey, connect with fellow travellers,
+            and make hometown travel more affordable.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{% url 'create_ride' %}" class="btn btn-primary-gt btn-lg">
+                <i class="bi bi-plus-circle"></i> Offer a Ride
+            </a>
+
+            <a href="{% url 'find_ride' %}" class="btn btn-outline-gt btn-lg">
+                <i class="bi bi-search"></i> Find a Ride
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/script.js' %}" defer></script>
+{% endblock %}

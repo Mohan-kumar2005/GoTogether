@@ -1,0 +1,447 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}GoTogether - Share Rides • Share Costs • Reach Home{% endblock %}</title>
+
+    <meta name="theme-color" content="#0b0b0b">
+    <meta name="description" content="GoTogether - Share rides, split travel costs, and reach home safely together.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png"
+          href="{% static 'images/gotogetherlogo.png' %}">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-gotogether sticky-top">
+    <div class="container">
+
+        <a class="navbar-brand d-flex align-items-center gap-2"
+           href="{% url 'home' %}">
+            <img src="{% static 'images/gotogetherlogo.png' %}"
+                 alt="GoTogether Logo"
+                 class="navbar-brand-logo">
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarContent"
+                aria-controls="navbarContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+                <li class="nav-item">
+                   <a class="nav-link" href="{% url 'home' %}">
+                     <i class="bi bi-house-door"></i> Home
+              </a>
+             </li>
+                
+                
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'find_ride' %}">
+                        <i class="bi bi-search"></i> Find Rides
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="{% url 'find_ride' %}?vehicle_type=2_WHEELER">
+                        <i class="bi bi-bicycle"></i> 2-Wheeler Rides
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="{% url 'find_ride' %}?vehicle_type=4_WHEELER">
+                        <i class="bi bi-car-front-fill"></i> 4-Wheeler Carpool
+                    </a>
+                </li>
+
+              <li class="nav-item">
+                 <a class="nav-link" href="{% url 'about' %}">
+               <i class="bi bi-info-circle-fill"></i> About Us
+               </a>
+               </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'contact' %}">
+                        <i class="bi bi-shield-check"></i> Safety & Helpline
+                    </a>
+                </li>
+
+            </ul>
+
+            <div class="navbar-actions d-flex align-items-center gap-2 flex-wrap">
+
+                <a href="{% url 'create_ride' %}"
+                   class="btn btn-outline-gt">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    Publish Ride
+                </a>
+
+                {% if user.is_authenticated %}
+
+                    <!-- Notifications -->
+                    <a href="{% url 'ride_requests' %}"
+                       class="btn btn-icon position-relative"
+                       title="Incoming Ride Requests"
+                       aria-label="Incoming Ride Requests">
+
+                        <i class="bi bi-bell-fill"></i>
+
+                        {% if pending_requests_count > 0 %}
+                            <span class="notification-badge">
+                                {{ pending_requests_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+
+                    <!-- Profile Dropdown -->
+                    <div class="dropdown">
+
+                        <button class="profile-toggle dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}"
+                                     alt="{{ user.username }}"
+                                     class="avatar-sm">
+                            {% else %}
+                                <span class="avatar-sm avatar-initial">
+                                    {{ user.username|make_list|first|upper }}
+                                </span>
+                            {% endif %}
+
+                            <span class="profile-toggle-name">
+                                {{ user.first_name|default:user.username }}
+                            </span>
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end profile-menu">
+
+                            <li class="profile-menu-header">
+                                <div class="fw-bold">
+                                    {{ user.get_full_name|default:user.username }}
+                                </div>
+
+                                <div class="small text-muted">
+                                    {{ user.profile.phone_number|default:"No phone" }}
+                                </div>
+
+                                {% if user.profile.is_license_verified %}
+                                    <span class="license-badge">
+                                        <i class="bi bi-shield-check"></i>
+                                        DL Verified
+                                    </span>
+                                {% endif %}
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                   href="{% url 'profile' %}">
+                                    <i class="bi bi-person"></i> My Profile
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                   href="{% url 'my_bookings' %}">
+                                    <i class="bi bi-ticket-perforated"></i>
+                                    My Booked Rides
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                   href="{% url 'my_rides' %}">
+                                    <i class="bi bi-car-front"></i>
+                                    My Offered Rides
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                   href="{% url 'ride_requests' %}">
+                                    <i class="bi bi-inbox"></i>
+                                    Passenger Requests
+
+                                    {% if pending_requests_count %}
+                                        <span class="badge bg-danger ms-1">
+                                            {{ pending_requests_count }}
+                                        </span>
+                                    {% endif %}
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                   href="{% url 'edit_profile' %}">
+                                    <i class="bi bi-gear"></i>
+                                    Edit Profile & License
+                                </a>
+                            </li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li>
+                                <a class="dropdown-item logout-link"
+                                   href="{% url 'logout' %}">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    Log Out
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                {% else %}
+
+                    <a href="{% url 'login' %}" class="btn btn-signin">
+                        Sign In
+                    </a>
+
+                    <a href="{% url 'signup' %}" class="btn btn-primary-gt">
+                        Sign Up <span class="otp-label">(OTP)</span>
+                    </a>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Django Messages -->
+{% if messages %}
+    <div class="container message-container">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show gt-alert"
+                 role="alert">
+
+                {% if message.tags == 'success' %}
+                    <i class="bi bi-check-circle-fill"></i>
+                {% elif message.tags == 'error' %}
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                {% else %}
+                    <i class="bi bi-info-circle-fill"></i>
+                {% endif %}
+
+                <span>{{ message }}</span>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close">
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Main Content -->
+<main id="main-content">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="gt-footer">
+    <div class="container">
+
+        <div class="row g-4">
+
+            <!-- Brand -->
+            <div class="col-lg-4 col-md-6">
+
+                <a href="{% url 'home' %}" class="footer-brand">
+                    <img src="{% static 'images/gotogetherlogo.png' %}"
+                         alt="GoTogether Logo"
+                         class="footer-logo">
+                </a>
+
+                <p class="footer-description">
+                    The dedicated festival travel carpooling and
+                    bike-pooling platform. Beat high private omnibus fares
+                    during Diwali, Pongal, and long weekends by sharing
+                    fuel costs and travelling safely together.
+                </p>
+
+                <div class="footer-badges">
+                    <span class="footer-badge">
+                        <i class="bi bi-shield-check"></i>
+                        DL Verified Community
+                    </span>
+
+                    <span class="footer-badge safety-badge">
+                        <i class="bi bi-telephone-fill"></i>
+                        24x7 Safety
+                    </span>
+                </div>
+
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6">
+
+                <h6 class="footer-heading">Quick Navigation</h6>
+
+                <ul class="footer-links">
+                    <li>
+                        <a href="{% url 'find_ride' %}">
+                            <i class="bi bi-search"></i> Search Rides
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'create_ride' %}">
+                            <i class="bi bi-plus-circle"></i> Offer a Ride
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'about' %}">
+                            <i class="bi bi-info-circle"></i> Our Mission
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'contact' %}">
+                            <i class="bi bi-shield-lock"></i> Safety Guidelines
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'signup' %}">
+                            <i class="bi bi-person-plus"></i> Sign Up with OTP
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+
+            <!-- Popular Routes -->
+            <div class="col-lg-3 col-md-6">
+
+                <h6 class="footer-heading">Popular Hometown Routes</h6>
+
+                <ul class="footer-links">
+                    <li>
+                        <a href="{% url 'find_ride' %}?source=Karur&destination=Chennai">
+                            Karur <span>↔</span> Chennai
+                            <small>(Car / 4W)</small>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'find_ride' %}?source=Coimbatore&destination=Karur">
+                            Coimbatore <span>↔</span> Karur
+                            <small>(Bike / 2W)</small>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'find_ride' %}?source=Chennai&destination=Trichy">
+                            Chennai <span>↔</span> Trichy
+                            <small>(Car / 4W)</small>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'find_ride' %}?source=Bangalore&destination=Salem">
+                            Bangalore <span>↔</span> Salem
+                            <small>(Car / 4W)</small>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'find_ride' %}?source=Madurai&destination=Chennai">
+                            Madurai <span>↔</span> Chennai
+                            <small>(Car / 4W)</small>
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+
+            <!-- Safety -->
+            <div class="col-lg-3 col-md-6">
+
+                <h6 class="footer-heading">Safety & Helmet Policy</h6>
+
+                <p class="footer-note">
+                    <i class="bi bi-shield-exclamation"></i>
+                    <strong>2-Wheeler Helmet:</strong>
+                    Helmets are mandatory for both rider and pillion
+                    passenger. Follow applicable traffic laws.
+                </p>
+
+                <p class="footer-note">
+                    <i class="bi bi-arrow-left-right"></i>
+                    <strong>Long Journey Safety:</strong>
+                    Take appropriate breaks and avoid driving when tired.
+                    Only eligible, licensed and insured drivers should drive.
+                </p>
+
+                <div class="emergency-badge">
+                    <i class="bi bi-telephone-fill"></i>
+                    Emergency SOS: 112 / 108
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr class="footer-divider">
+
+        <div class="footer-bottom">
+            <p>
+                &copy; 2026 GoTogether Platform.
+                All rights reserved.
+                <span class="footer-tagline">
+                    Share Rides • Share Costs • Reach Home.
+                </span>
+            </p>
+
+            <div class="footer-bottom-right">
+                <span>Designed for festival hometown travel</span>
+                <span>Tamil Nadu & South India</span>
+            </div>
+        </div>
+
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script src="{% static 'js/script.js' %}"></script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

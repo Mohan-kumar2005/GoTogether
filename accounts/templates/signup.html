@@ -1,0 +1,299 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if otp_step %}Verify Gmail OTP{% else %}Create Account{% endif %} - GoTogether
+{% endblock %}
+
+{% block content %}
+<main class="signup-page">
+    <div class="signup-container">
+
+        <div class="signup-card">
+
+            {% if otp_step %}
+
+                <!-- OTP VERIFICATION -->
+
+                <div class="signup-header">
+                    <img
+                        src="{% static 'images/gotogetherlogo.png' %}"
+                        alt="GoTogether Logo"
+                        class="signup-logo"
+                    >
+
+                    <div class="signup-main-icon">
+                        <i class="bi bi-envelope-paper-heart-fill"></i>
+                    </div>
+
+                    <p class="signup-eyebrow">ONE LAST STEP</p>
+                    <h1>Verify your <span>email.</span></h1>
+
+                    <p class="signup-description">
+                        Enter the six-digit verification code sent to your email.
+                    </p>
+
+                    <div class="signup-email-badge">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span>{{ email }}</span>
+                    </div>
+
+                    {% if phone %}
+                        <p class="signup-phone-note">
+                            Registered mobile: {{ phone }}
+                        </p>
+                    {% endif %}
+
+                    <a
+                        href="https://mail.google.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="signup-gmail-link"
+                    >
+                        <i class="bi bi-google"></i>
+                        Open Gmail inbox
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                </div>
+
+                {% if messages %}
+                    <div class="signup-messages" aria-live="polite">
+                        {% for message in messages %}
+                            <div class="signup-alert {{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                
+
+                <form
+                    id="otpForm"
+                    action="{% url 'verify_otp' %}"
+                    method="POST"
+                >
+                    {% csrf_token %}
+
+                    <div class="signup-field otp-field">
+                        <label for="otpInput">Six-digit verification code</label>
+
+                        <input
+                            type="text"
+                            id="otpInput"
+                            name="otp"
+                            class="otp-input"
+                            maxlength="6"
+                            minlength="6"
+                            pattern="[0-9]{6}"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            placeholder="000000"
+                            aria-describedby="otpHelp"
+                            required
+                            autofocus
+                        >
+
+                        <small id="otpHelp">
+                            Enter the six digits from your verification email.
+                        </small>
+                    </div>
+
+                    <button type="submit" class="signup-submit-btn">
+                        <span>
+                            <i class="bi bi-shield-check"></i>
+                            Verify and continue
+                        </span>
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="signup-resend">
+                    <p>Didn't receive the email?</p>
+                    <a href="{% url 'resend_otp' %}">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Resend verification code
+                    </a>
+                    <small>
+                        Check your spam folder if the email is missing.
+                    </small>
+                </div>
+
+            {% else %}
+
+                <!-- REGISTRATION FORM -->
+
+                <div class="signup-header">
+                    <img
+                        src="{% static 'images/gotogetherlogo.png' %}"
+                        alt="GoTogether Logo"
+                        class="signup-logo"
+                    >
+
+                    <p class="signup-eyebrow">YOUR JOURNEY STARTS HERE</p>
+                    <h1>Join <span>GoTogether.</span></h1>
+
+                    <p class="signup-description">
+                        Meet fellow travellers, share your ride, and split
+                        travel costs fairly.
+                    </p>
+                </div>
+
+                {% if messages %}
+                    <div class="signup-messages" aria-live="polite">
+                        {% for message in messages %}
+                            <div class="signup-alert {{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form
+                    id="signupForm"
+                    action="{% url 'signup' %}"
+                    method="POST"
+                >
+                    {% csrf_token %}
+
+                    <div class="signup-field">
+                        <label for="{{ form.username.id_for_label }}">
+                            Username <span>*</span>
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="signup-error">
+                                {{ form.username.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="signup-name-grid">
+                        <div class="signup-field">
+                            <label for="{{ form.first_name.id_for_label }}">
+                                First name
+                            </label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="signup-error">
+                                    {{ form.first_name.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="signup-field">
+                            <label for="{{ form.last_name.id_for_label }}">
+                                Last name
+                            </label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="signup-error">
+                                    {{ form.last_name.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="signup-field">
+                        <label for="{{ form.email.id_for_label }}">
+                            <i class="bi bi-envelope-fill"></i>
+                            Email address <span>*</span>
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="signup-error">
+                                {{ form.email.errors }}
+                            </div>
+                        {% endif %}
+                        <small>
+                            Use an email address you can access to receive your OTP.
+                        </small>
+                    </div>
+
+                    <div class="signup-field">
+                        <label for="{{ form.phone_number.id_for_label }}">
+                            <i class="bi bi-phone-fill"></i>
+                            Mobile number <span>*</span>
+                        </label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                            <div class="signup-error">
+                                {{ form.phone_number.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="signup-field">
+                        <label for="{{ form.password.id_for_label }}">
+                            Password <span>*</span>
+                        </label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <div class="signup-error">
+                                {{ form.password.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="signup-field">
+                        <label for="{{ form.confirm_password.id_for_label }}">
+                            Confirm password <span>*</span>
+                        </label>
+                        {{ form.confirm_password }}
+                        {% if form.confirm_password.errors %}
+                            <div class="signup-error">
+                                {{ form.confirm_password.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="signup-security-note">
+                        <div class="security-note-icon">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </div>
+                        <div>
+                            <strong>Email verification</strong>
+                            <p>
+                                Verify your email before accessing your
+                                GoTogether account.
+                            </p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="signup-submit-btn">
+                        <span>
+                            Continue and send OTP
+                        </span>
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="signup-footer">
+                    <p>Already have an account?</p>
+                    <a href="{% url 'login' %}">
+                        Sign in <i class="bi bi-arrow-up-right"></i>
+                    </a>
+                </div>
+
+            {% endif %}
+
+            <div class="signup-bottom-brand">
+                <span></span>
+                <p>Share the Ride, Share the Journey.</p>
+                <span></span>
+            </div>
+
+        </div>
+
+        <p class="signup-page-caption">
+            Travel together. Save together. Go together.
+        </p>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/script.js' %}" defer></script>
+{% endblock %}

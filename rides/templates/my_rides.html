@@ -1,0 +1,239 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Offered Rides - GoTogether{% endblock %}
+
+{% block content %}
+<section class="my-rides-page">
+    <div class="my-rides-container">
+
+        <!-- Page Header -->
+        <header class="my-rides-header">
+            <div class="my-rides-heading-content">
+                <span class="my-rides-eyebrow">
+                    <i class="bi bi-speedometer2"></i> DRIVER DASHBOARD
+                </span>
+                <h1>My Offered <span>Rides</span></h1>
+                <p>Manage your published journeys and review co-passenger requests.</p>
+            </div>
+
+            <div class="my-rides-header-actions">
+                <img
+                    src="{% static 'images/gotogetherlogo.png' %}"
+                    alt="GoTogether"
+                    class="my-rides-logo"
+                >
+                <a href="{% url 'create_ride' %}" class="my-rides-primary-btn">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    Offer New Ride
+                </a>
+            </div>
+        </header>
+
+        <!-- Ride Summary -->
+        {% if rides %}
+            <div class="my-rides-summary">
+                <div class="my-rides-summary-card">
+                    <div class="my-rides-summary-icon">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+                    <div>
+                        <span>Total Listed Rides</span>
+                        <strong>{{ rides|length }}</strong>
+                    </div>
+                </div>
+
+                <div class="my-rides-summary-card">
+                    <div class="my-rides-summary-icon my-rides-summary-icon-orange">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div>
+                        <span>Manage Your Journeys</span>
+                        <strong>My Rides</strong>
+                    </div>
+                </div>
+
+                <a href="{% url 'create_ride' %}" class="my-rides-summary-action">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Create another ride</span>
+                    <i class="bi bi-arrow-up-right"></i>
+                </a>
+            </div>
+
+            <!-- Section Heading -->
+            <div class="my-rides-section-heading">
+                <div>
+                    <h2>Your Published Journeys</h2>
+                    <p>View your route, departure details, seat availability and requests.</p>
+                </div>
+                <span class="my-rides-total-count">
+                    {{ rides|length }} ride{{ rides|length|pluralize }}
+                </span>
+            </div>
+
+            <!-- Ride List -->
+            <div class="my-rides-list">
+                {% for ride in rides %}
+                    <article class="my-rides-card">
+
+                        <!-- Route and Status -->
+                        <div class="my-rides-card-main">
+                            <div class="my-rides-card-top">
+                                <div class="my-rides-badges">
+                                    {% if ride.vehicle_type == '2_WHEELER' %}
+                                        <span class="my-rides-badge my-rides-bike">
+                                            <i class="bi bi-bicycle"></i> 2-Wheeler
+                                        </span>
+                                    {% else %}
+                                        <span class="my-rides-badge my-rides-car">
+                                            <i class="bi bi-car-front-fill"></i> 4-Wheeler
+                                        </span>
+                                    {% endif %}
+
+                                    {% if ride.status == 'ACTIVE' %}
+                                        <span class="my-rides-badge my-rides-status-active">
+                                            <span class="my-rides-status-dot"></span> Active
+                                        </span>
+                                    {% elif ride.status == 'FULL' %}
+                                        <span class="my-rides-badge my-rides-status-full">
+                                            <i class="bi bi-people-fill"></i> Fully Booked
+                                        </span>
+                                    {% elif ride.status == 'CANCELLED' %}
+                                        <span class="my-rides-badge my-rides-status-cancelled">
+                                            <i class="bi bi-x-circle-fill"></i> Cancelled
+                                        </span>
+                                    {% else %}
+                                        <span class="my-rides-badge my-rides-status-other">
+                                            {{ ride.get_status_display }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <h3 class="my-rides-route-title">
+                                {{ ride.source_city }}
+                                <i class="bi bi-arrow-right"></i>
+                                {{ ride.destination_city }}
+                            </h3>
+
+                            <div class="my-rides-pickup-drop">
+                                <div>
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                    <span>{{ ride.pickup_point|default:"Pickup point not specified" }}</span>
+                                </div>
+                                <i class="bi bi-arrow-down my-rides-route-down"></i>
+                                <div>
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span>{{ ride.drop_point|default:"Drop point not specified" }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ride Details -->
+                        <div class="my-rides-details">
+                            <div class="my-rides-detail-item">
+                                <span class="my-rides-detail-icon">
+                                    <i class="bi bi-calendar3"></i>
+                                </span>
+                                <div>
+                                    <small>Departure Date</small>
+                                    <strong>{{ ride.departure_date|date:"D, d M Y" }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="my-rides-detail-item">
+                                <span class="my-rides-detail-icon">
+                                    <i class="bi bi-clock"></i>
+                                </span>
+                                <div>
+                                    <small>Departure Time</small>
+                                    <strong>{{ ride.departure_time|time:"H:i" }} hrs</strong>
+                                </div>
+                            </div>
+
+                            <div class="my-rides-detail-item">
+                                <span class="my-rides-detail-icon">
+                                    <i class="bi bi-people"></i>
+                                </span>
+                                <div>
+                                    <small>Seats Available</small>
+                                    <strong>
+                                        {{ ride.available_seats }} / {{ ride.total_seats }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Price and Actions -->
+                        <div class="my-rides-card-footer">
+                            <div class="my-rides-price">
+                                <span>Cost Per Seat</span>
+                                <strong>₹{{ ride.cost_per_seat }}</strong>
+                                <small>Estimated travel share</small>
+                            </div>
+
+                            <div class="my-rides-actions">
+                                <a
+                                    href="{% url 'ride_specific_requests' ride.id %}"
+                                    class="my-rides-request-btn"
+                                >
+                                    <i class="bi bi-people-fill"></i>
+                                    Passenger Requests
+                                    <span class="my-rides-request-count">
+                                        {{ ride.requests.count }}
+                                    </span>
+                                </a>
+
+                                <a
+                                    href="{% url 'edit_ride' ride.id %}"
+                                    class="my-rides-manage-btn"
+                                >
+                                    <i class="bi bi-gear-fill"></i>
+                                    Manage Ride
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                    </article>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <!-- Empty State -->
+            <section class="my-rides-empty">
+                <div class="my-rides-empty-icon">
+                    <i class="bi bi-car-front-fill"></i>
+                </div>
+
+                <span class="my-rides-eyebrow">YOUR NEXT JOURNEY AWAITS</span>
+                <h2>You haven't offered any rides yet</h2>
+                <p>
+                    Planning a trip to your hometown? Publish your journey,
+                    share available seats, split travel costs and connect with
+                    fellow travellers.
+                </p>
+
+                <a href="{% url 'create_ride' %}" class="my-rides-primary-btn">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    Offer Your First Ride
+                </a>
+            </section>
+        {% endif %}
+
+        <div class="my-rides-footer-note">
+            <i class="bi bi-shield-check"></i>
+            <span>
+                Keep your ride information updated and review passenger requests
+                before confirming a journey.
+            </span>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/script.js' %}" defer></script>
+{% endblock %}

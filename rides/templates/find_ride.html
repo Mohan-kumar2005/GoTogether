@@ -1,0 +1,353 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Find Hometown Festival Rides - GoTogether{% endblock %}
+
+{% block content %}
+<section class="find-ride-page">
+    <div class="find-ride-container">
+
+        <!-- Page Heading -->
+        <header class="find-ride-heading">
+            <div class="find-ride-heading-content">
+                <span class="find-ride-eyebrow">
+                    <i class="bi bi-compass-fill"></i> YOUR JOURNEY STARTS HERE
+                </span>
+                <h1>Find Your <span>Ride</span></h1>
+                <p>Heading home for a festival? Find fellow travellers and share the journey cost.</p>
+            </div>
+
+            <a href="{% url 'create_ride' %}" class="find-ride-offer-btn">
+                <i class="bi bi-plus-circle-fill"></i>
+                Offer a Ride
+            </a>
+        </header>
+
+        <!-- Search and Filters -->
+        <section class="find-ride-search-card">
+            <div class="find-ride-search-heading">
+                <div class="find-ride-search-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div>
+                    <h2>Find Your Perfect Ride</h2>
+                    <p>Choose your route, date and travel preferences.</p>
+                </div>
+            </div>
+
+            <form action="{% url 'find_ride' %}" method="GET" id="findRideFilterForm">
+
+                <div class="find-ride-filter-grid">
+                    <div class="find-ride-field">
+                        <label for="findRideSource">
+                            <i class="bi bi-geo-alt"></i> Leaving From
+                        </label>
+                        <input
+                            type="text"
+                            id="findRideSource"
+                            name="source"
+                            placeholder="e.g. Karur, Coimbatore"
+                            value="{{ source }}"
+                            autocomplete="address-level2"
+                        >
+                    </div>
+
+                    <div class="find-ride-field">
+                        <label for="findRideDestination">
+                            <i class="bi bi-geo-alt-fill"></i> Going To
+                        </label>
+                        <input
+                            type="text"
+                            id="findRideDestination"
+                            name="destination"
+                            placeholder="Your hometown"
+                            value="{{ destination }}"
+                            autocomplete="address-level2"
+                        >
+                    </div>
+
+                    <div class="find-ride-field">
+                        <label for="findRideDate">
+                            <i class="bi bi-calendar-event"></i> Travel Date
+                        </label>
+                        <input
+                            type="date"
+                            id="findRideDate"
+                            name="date"
+                            value="{{ travel_date }}"
+                        >
+                    </div>
+
+                    <div class="find-ride-field">
+                        <label for="findRideVehicle">
+                            <i class="bi bi-car-front"></i> Vehicle Type
+                        </label>
+                        <select id="findRideVehicle" name="vehicle_type">
+                            <option value="">All Vehicles</option>
+                            <option value="2_WHEELER" {% if vehicle_type == '2_WHEELER' %}selected{% endif %}>
+                                2-Wheeler (Bike)
+                            </option>
+                            <option value="4_WHEELER" {% if vehicle_type == '4_WHEELER' %}selected{% endif %}>
+                                4-Wheeler (Car)
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="find-ride-extra-filters">
+                    <div class="find-ride-field find-ride-festival-field">
+                        <label for="findRideFestival">
+                            <i class="bi bi-stars"></i> Festival / Occasion
+                        </label>
+                        <select id="findRideFestival" name="festival">
+                            <option value="">Any Travel Occasion</option>
+                            {% for code, label in festivals %}
+                                <option value="{{ code }}" {% if festival == code %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label class="find-ride-swap-option" for="swapFilter">
+                        <input
+                            type="checkbox"
+                            name="swap_driving"
+                            value="yes"
+                            id="swapFilter"
+                            {% if swap_driving == 'yes' %}checked{% endif %}
+                        >
+                        <span class="find-ride-custom-check">
+                            <i class="bi bi-check2"></i>
+                        </span>
+                        <span class="find-ride-swap-text">
+                            <strong>Open to swap driving</strong>
+                            <small>Show rides welcoming eligible co-drivers</small>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="find-ride-filter-actions">
+                    <a href="{% url 'find_ride' %}" class="find-ride-reset-btn">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Reset Filters
+                    </a>
+
+                    <button type="submit" class="find-ride-submit-btn">
+                        <i class="bi bi-search"></i>
+                        Search Rides
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Search Results Heading -->
+        <div class="find-ride-results-heading">
+            <div>
+                <span class="find-ride-eyebrow">YOUR OPTIONS</span>
+                <h2>Available Rides
+                    <span class="find-ride-count">{{ total_found }}</span>
+                </h2>
+                <p>Find a route that matches your plans.</p>
+            </div>
+
+            <div class="find-ride-sort-label">
+                <i class="bi bi-sort-down"></i>
+                Earliest Departure
+            </div>
+        </div>
+
+        <!-- Ride Results -->
+        {% if rides %}
+            <div class="find-ride-results-grid">
+                {% for ride in rides %}
+                    <article class="find-ride-card">
+
+                        <!-- Vehicle and Festival Badges -->
+                        <div class="find-ride-card-top">
+                            <div class="find-ride-card-badges">
+                                {% if ride.vehicle_type == '2_WHEELER' %}
+                                    <span class="find-ride-badge find-ride-bike">
+                                        <i class="bi bi-bicycle"></i> 2-Wheeler
+                                    </span>
+                                {% else %}
+                                    <span class="find-ride-badge find-ride-car">
+                                        <i class="bi bi-car-front-fill"></i> 4-Wheeler
+                                    </span>
+                                {% endif %}
+
+                                {% if ride.festival != 'NONE' %}
+                                    <span class="find-ride-badge find-ride-festival">
+                                        <i class="bi bi-stars"></i>
+                                        {{ ride.get_festival_display }}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <span class="find-ride-seats">
+                                <i class="bi bi-people-fill"></i>
+                                {{ ride.available_seats }} left
+                            </span>
+                        </div>
+
+                        <!-- Route Timeline -->
+                        <div class="find-ride-route">
+                            <div class="find-ride-route-point">
+                                <div class="find-ride-timeline-marker">
+                                    <span class="find-ride-origin-dot"></span>
+                                </div>
+
+                                <div class="find-ride-location">
+                                    <div class="find-ride-location-top">
+                                        <h3>{{ ride.source_city }}</h3>
+                                        <span>{{ ride.departure_date|date:"d M, Y" }}</span>
+                                    </div>
+                                    <p>
+                                        <i class="bi bi-pin-map-fill"></i>
+                                        {{ ride.pickup_point|default:"Pickup point to be confirmed" }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="find-ride-route-point find-ride-destination-point">
+                                <div class="find-ride-timeline-marker">
+                                    <span class="find-ride-destination-icon">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                    </span>
+                                </div>
+
+                                <div class="find-ride-location">
+                                    <div class="find-ride-location-top">
+                                        <h3>{{ ride.destination_city }}</h3>
+                                        <span>{{ ride.departure_time|time:"H:i" }}</span>
+                                    </div>
+                                    <p>
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        {{ ride.drop_point|default:"Drop point to be confirmed" }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ride Features -->
+                        <div class="find-ride-features">
+                            {% if ride.is_two_wheeler %}
+                                <span class="find-ride-feature find-ride-helmet">
+                                    <i class="bi bi-shield-fill-check"></i>
+                                    Helmet Mandatory
+                                </span>
+
+                                {% if ride.has_spare_helmet %}
+                                    <span class="find-ride-feature find-ride-spare-helmet">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Spare Helmet
+                                    </span>
+                                {% else %}
+                                    <span class="find-ride-feature find-ride-own-helmet">
+                                        <i class="bi bi-shield"></i>
+                                        Bring Own Helmet
+                                    </span>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if ride.open_to_swap_driving %}
+                                <span class="find-ride-feature find-ride-swap-badge">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                    Swap Driving
+                                </span>
+                            {% endif %}
+
+                            {% if ride.vehicle_model %}
+                                <span class="find-ride-feature find-ride-model">
+                                    <i class="bi bi-car-front"></i>
+                                    {{ ride.vehicle_model }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Driver and Cost -->
+                        <div class="find-ride-card-footer">
+                            <div class="find-ride-driver">
+                                {% if ride.driver.profile.avatar %}
+                                    <img
+                                        src="{{ ride.driver.profile.avatar.url }}"
+                                        alt="{{ ride.driver.first_name|default:ride.driver.username }}"
+                                        class="find-ride-avatar"
+                                        loading="lazy"
+                                    >
+                                {% else %}
+                                    <div class="find-ride-avatar find-ride-avatar-placeholder">
+                                        {{ ride.driver.first_name|default:ride.driver.username|make_list|first|upper }}
+                                    </div>
+                                {% endif %}
+
+                                <div class="find-ride-driver-details">
+                                    <strong>
+                                        {{ ride.driver.first_name|default:ride.driver.username }}
+                                        {% if ride.driver.profile.is_license_verified %}
+                                            <i class="bi bi-patch-check-fill find-ride-verified-icon"
+                                               title="Driving licence verified"
+                                               aria-label="Driving licence verified"></i>
+                                        {% endif %}
+                                    </strong>
+                                    <span>
+                                        <i class="bi bi-shield-check"></i>
+                                        GoTogether Driver
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="find-ride-price">
+                                <span>Cost per seat</span>
+                                <strong>₹{{ ride.cost_per_seat }}</strong>
+                                <small>Estimated share</small>
+                            </div>
+                        </div>
+
+                        <!-- Details Action -->
+                        <a href="{% url 'ride_details' ride.id %}" class="find-ride-details-btn">
+                            View Ride Details
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </article>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <!-- Empty State -->
+            <section class="find-ride-empty">
+                <div class="find-ride-empty-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                <span class="find-ride-eyebrow">NO MATCHES YET</span>
+                <h2>No matching rides found</h2>
+                <p>
+                    Try a different city, travel date or vehicle type.
+                    You can also offer a ride to help others travel home.
+                </p>
+
+                <div class="find-ride-empty-actions">
+                    <a href="{% url 'find_ride' %}" class="find-ride-reset-btn">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Clear Filters
+                    </a>
+                    <a href="{% url 'create_ride' %}" class="find-ride-submit-btn">
+                        <i class="bi bi-plus-circle"></i>
+                        Offer a Ride
+                    </a>
+                </div>
+            </section>
+        {% endif %}
+
+        <div class="find-ride-bottom-note">
+            <i class="bi bi-shield-check"></i>
+            Confirm journey details and agree on cost-sharing arrangements before travelling.
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/script.js' %}" defer></script>
+{% endblock %}

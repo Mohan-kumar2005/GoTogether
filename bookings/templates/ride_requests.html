@@ -1,0 +1,357 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Incoming Passenger Requests - GoTogether{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ride_requests.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="rrq-page">
+    <div class="rrq-container">
+
+        <!-- Page Header -->
+        <header class="rrq-header">
+            <div class="rrq-heading">
+                <span class="rrq-eyebrow">
+                    <i class="bi bi-people-fill"></i>
+                    DRIVER DASHBOARD
+                </span>
+
+                <h1>Incoming Passenger Requests</h1>
+
+                <p>
+                    Review travelers who want to join your ride
+                    and share the travel costs.
+                </p>
+            </div>
+
+            <div class="rrq-header-actions">
+                <img
+                    src="{% static 'images/gotogetherlogo.png' %}"
+                    alt="GoTogether"
+                    class="rrq-logo"
+                >
+
+                {% if ride %}
+                    <a href="{% url 'ride_details' ride.id %}"
+                       class="rrq-btn rrq-btn-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Back to Ride
+                    </a>
+                {% else %}
+                    <a href="{% url 'my_rides' %}"
+                       class="rrq-btn rrq-btn-secondary">
+                        <i class="bi bi-car-front"></i>
+                        My Offered Rides
+                    </a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Request Summary -->
+        <div class="rrq-summary">
+            <div class="rrq-summary-icon">
+                <i class="bi bi-person-lines-fill"></i>
+            </div>
+
+            <div>
+                <span class="rrq-summary-label">Passenger requests</span>
+                <strong>
+                    {% if requests %}
+                        {{ requests|length }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </strong>
+            </div>
+        </div>
+
+        {% if requests %}
+            <div class="rrq-list">
+
+                {% for req in requests %}
+                    <article class="rrq-card
+                        {% if req.status == 'PENDING' %}rrq-card-pending{% endif %}">
+
+                        <!-- Card Top -->
+                        <div class="rrq-card-top">
+
+                            <!-- Passenger Details -->
+                            <div class="rrq-passenger">
+                                {% if req.passenger.profile.avatar %}
+                                    <img
+                                        src="{{ req.passenger.profile.avatar.url }}"
+                                        alt="{{ req.passenger.username }}"
+                                        class="rrq-avatar"
+                                    >
+                                {% else %}
+                                    <div class="rrq-avatar rrq-avatar-placeholder">
+                                        {{ req.passenger.username|make_list|first|upper }}
+                                    </div>
+                                {% endif %}
+
+                                <div class="rrq-passenger-info">
+                                    <h2>
+                                        {{ req.passenger.get_full_name|default:req.passenger.username }}
+                                    </h2>
+
+                                    <span class="rrq-username">
+                                        @{{ req.passenger.username }}
+                                    </span>
+
+                                    {% if req.passenger.profile.is_phone_verified %}
+                                        <span class="rrq-verified">
+                                            <i class="bi bi-patch-check-fill"></i>
+                                            Phone Verified
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Request Status -->
+                            <div class="rrq-status-wrap">
+                                {% if req.status == 'PENDING' %}
+                                    <span class="rrq-status rrq-status-pending">
+                                        <span class="rrq-status-dot"></span>
+                                        Pending
+                                    </span>
+                                {% elif req.status == 'ACCEPTED' %}
+                                    <span class="rrq-status rrq-status-accepted">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Accepted
+                                    </span>
+                                {% else %}
+                                    <span class="rrq-status rrq-status-other">
+                                        {{ req.get_status_display }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="rrq-divider"></div>
+
+                        <!-- Travel Details -->
+                        <div class="rrq-details-grid">
+
+                            <section class="rrq-detail-section">
+                                <span class="rrq-section-label">
+                                    <i class="bi bi-signpost-2"></i>
+                                    TRAVEL ROUTE
+                                </span>
+
+                                <div class="rrq-route">
+                                    <div class="rrq-route-point">
+                                        <span class="rrq-route-dot"></span>
+                                        <strong>{{ req.ride.source_city }}</strong>
+                                    </div>
+
+                                    <div class="rrq-route-line"></div>
+
+                                    <div class="rrq-route-point">
+                                        <span class="rrq-route-dot rrq-route-dot-end"></span>
+                                        <strong>{{ req.ride.destination_city }}</strong>
+                                    </div>
+                                </div>
+
+                                <div class="rrq-travel-time">
+                                    <span>
+                                        <i class="bi bi-calendar3"></i>
+                                        {{ req.ride.departure_date|date:"d M Y" }}
+                                    </span>
+
+                                    <span>
+                                        <i class="bi bi-clock"></i>
+                                        {{ req.ride.departure_time|time:"H:i" }}
+                                    </span>
+                                </div>
+                            </section>
+
+                            <!-- Seats and Fare -->
+                            <section class="rrq-detail-section rrq-fare-section">
+                                <span class="rrq-section-label">
+                                    <i class="bi bi-ticket-perforated"></i>
+                                    BOOKING DETAILS
+                                </span>
+
+                                <div class="rrq-fare-box">
+                                    <div>
+                                        <span class="rrq-fare-label">Seats requested</span>
+                                        <strong>
+                                            {{ req.seats_booked }}
+                                            seat{{ req.seats_booked|pluralize }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="rrq-fare-divider"></div>
+
+                                    <div>
+                                        <span class="rrq-fare-label">Total fare</span>
+                                        <strong class="rrq-fare-amount">
+                                            ₹{{ req.total_fare }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Safety and Driving -->
+                            <section class="rrq-detail-section">
+                                <span class="rrq-section-label">
+                                    <i class="bi bi-shield-check"></i>
+                                    SAFETY & DRIVING
+                                </span>
+
+                                <div class="rrq-safety-list">
+
+                                    {% if req.willing_to_swap_driving %}
+                                        <div class="rrq-safety-item rrq-safety-positive">
+                                            <i class="bi bi-arrow-left-right"></i>
+                                            <span>Willing to share driving</span>
+                                        </div>
+
+                                        {% if req.license_number %}
+                                            <div class="rrq-license">
+                                                <i class="bi bi-card-text"></i>
+                                                DL: {{ req.license_number }}
+                                            </div>
+                                        {% endif %}
+
+                                    {% elif req.knows_driving %}
+                                        <div class="rrq-safety-item rrq-safety-neutral">
+                                            <i class="bi bi-car-front"></i>
+                                            <span>Knows driving — no swap</span>
+                                        </div>
+
+                                    {% else %}
+                                        <div class="rrq-safety-item rrq-safety-neutral">
+                                            <i class="bi bi-person"></i>
+                                            <span>Passenger only</span>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if req.ride.is_two_wheeler %}
+                                        {% if req.confirmed_helmet %}
+                                            <div class="rrq-safety-item rrq-safety-positive">
+                                                <i class="bi bi-shield-fill-check"></i>
+                                                <span>Helmet confirmed</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="rrq-safety-item rrq-safety-warning">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                                <span>Helmet not confirmed</span>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+
+                                </div>
+                            </section>
+                        </div>
+
+                        <!-- Passenger Notes -->
+                        {% if req.pickup_note or req.passenger_message %}
+                            <div class="rrq-notes">
+                                <span class="rrq-notes-icon">
+                                    <i class="bi bi-chat-left-text"></i>
+                                </span>
+
+                                <div class="rrq-notes-content">
+                                    {% if req.pickup_note %}
+                                        <div class="rrq-note-row">
+                                            <strong>Pickup note</strong>
+                                            <p>{{ req.pickup_note }}</p>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if req.passenger_message %}
+                                        <div class="rrq-note-row">
+                                            <strong>Passenger message</strong>
+                                            <p>{{ req.passenger_message }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Actions -->
+                        <footer class="rrq-card-footer">
+                            <span class="rrq-footer-hint">
+                                {% if req.status == 'PENDING' %}
+                                    Review this request before responding.
+                                {% elif req.status == 'ACCEPTED' %}
+                                    This passenger's request has been accepted.
+                                {% else %}
+                                    Request status: {{ req.get_status_display }}
+                                {% endif %}
+                            </span>
+
+                            <div class="rrq-actions">
+                                {% if req.status == 'PENDING' %}
+                                    <a
+                                        href="{% url 'respond_request' req.id 'accept' %}"
+                                        class="rrq-btn rrq-btn-accept"
+                                    >
+                                        <i class="bi bi-check-lg"></i>
+                                        Accept Request
+                                    </a>
+
+                                    <a
+                                        href="{% url 'respond_request' req.id 'reject' %}"
+                                        class="rrq-btn rrq-btn-decline"
+                                        data-confirm-decline
+                                    >
+                                        <i class="bi bi-x-lg"></i>
+                                        Decline
+                                    </a>
+
+                                {% elif req.status == 'ACCEPTED' %}
+                                    <a
+                                        href="{% url 'booking_detail' req.id %}"
+                                        class="rrq-btn rrq-btn-primary"
+                                    >
+                                        <i class="bi bi-ticket-detailed"></i>
+                                        View Pass
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </footer>
+
+                    </article>
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+            <!-- Empty State -->
+            <section class="rrq-empty">
+                <div class="rrq-empty-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+
+                <h2>No passenger requests yet</h2>
+
+                <p>
+                    When travelers find your ride and request to share
+                    the travel costs, their requests will appear here.
+                </p>
+
+                <a href="{% url 'my_rides' %}" class="rrq-btn rrq-btn-primary">
+                    <i class="bi bi-car-front-fill"></i>
+                    Manage My Rides
+                </a>
+            </section>
+        {% endif %}
+
+        <div class="rrq-bottom-note">
+            <i class="bi bi-shield-lock"></i>
+            Travel responsibly. Review passenger details before confirming a ride.
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/ride_requests.js' %}"></script>
+{% endblock %}
